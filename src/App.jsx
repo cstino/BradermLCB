@@ -21,10 +21,11 @@ const FONT = "'Outfit', sans-serif";
 const COMPANY = {
   name: "LCB S.r.l.",
   sub: "Laboratori Chimici Braccili",
-  address: "Roseto degli Abruzzi (TE), Italy",
-  email: "info@lcb-srl.it",
-  phone: "+39 085 893 0567",
-  website: "https://www.lcb-srl.it"
+  address: "Via Scozia 5, 64026, Roseto degli Abruzzi (TE), Italy",
+  email: "laboratorio@lcblab.com",
+  phone: "+39 085 946 3073",
+  whatsapp: "+39 3793096073",
+  websites: ["www.braderm.com", "www.lcblab.com"]
 };
 
 const LANG = {
@@ -153,7 +154,7 @@ const LANG = {
   }
 };
 
-const Icon = ({ name, size = 24, color = "currentColor" }) => {
+const Icon = ({ name, size = 24, color = "currentColor", fill = "none", strokeWidth = 2 }) => {
   const paths = {
     book: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3.5a.5.5 0 0 0-.5-.5H6.5A2.5 2.5 0 0 0 4 5.5v14z M12 3v14",
     tube: "M7 2v18a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2M7 5h10M7 8h10",
@@ -163,10 +164,22 @@ const Icon = ({ name, size = 24, color = "currentColor" }) => {
     sparkle: "M12 2l2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z",
     flask: "M9 3h6v3l4 10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L9 6V3z M9 8h6",
     edit: "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7 M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z",
-    trash: "M3 6h18 M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2 M10 11v6 M14 11v6"
+    trash: "M3 6h18 M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2 M10 11v6 M14 11v6",
+    phone: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z",
+    whatsapp: "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.414 0 .018 5.396.015 12.03c0 2.12.541 4.19 1.57 6.04L0 24l6.117-1.605a11.803 11.803 0 005.925 1.598h.005c6.635 0 12.032-5.396 12.035-12.032a11.762 11.762 0 00-3.466-8.498",
+    mail: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22 6l-10 7L2 6",
+    globe: "M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z M2 12h20 M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z",
+    mapPin: "M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+    truck: "M1 14h15V4H1v10z M16 14h5l3-3V7h-8v7z M3 14a3 3 0 1 0 6 0 3 3 0 0 0-6 0z M17 14a3 3 0 1 0 6 0 3 3 0 0 0-6 0z",
+    shop: "M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z M3 3h18v6H3V3z M12 3v6",
+    users: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75",
+    search: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z M21 21l-4.35-4.35",
+    chevronRight: "M9 18l6-6-6-6",
+    check: "M20 6L9 17l-5-5",
+    file: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6"
   };
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
       <path d={paths[name] || paths.book} />
     </svg>
   );
@@ -182,13 +195,54 @@ const BROCHURES_INITIAL = [
   { id: 7, line: "LCB LAB", title: "Private Label", desc: "Your customized product line", color: T.teal, icon: "flask", file: "/brochure/LCB_private_label.pdf", cover: "https://xogyjctphyuyneldhrff.supabase.co/storage/v1/object/public/assets/private_label_cover.png", active: true },
 ];
 
+const TECHNICAL_SHEETS = [
+  "ADIPHASE CREMA", "ADIPHASE SCRUB", "AKARISCAB Doccia shampoo", "AKARISCAB topical treatment",
+  "AXATOPIC CREMA", "AXATOPIC DETERGENTE", "AZEKUR", "AZN CREMA", "AZN SCRUB", "CIKAVES",
+  "CONTORNO OCCHI BRADERM", "CREMA INTIMA DEF", "D.G.M. PLUS", "DETERGENTE DELICATO DEF",
+  "DISTROFYD", "DORSAK", "ELACTIVE DEF", "Exoker Doccia shampoo", "Exoker Spray",
+  "HIDRANUR", "KERATO 20", "KERATO PSOR DETERGENTE", "KERATO PSOR SHAMPOO", "KERATO-FORTE",
+  "KURAC DEF (ZOYLAK)", "KURAGE 2024", "LAKERAL", "LIOKER SHAMPOO", "MICOBAT CREMA",
+  "MICOBAT DETERGENTE", "MICOBAT LAVANDA DEF", "MICOBAT POLVERE", "ONYCROM", "OXAGE 2024",
+  "PHOTOALA-5", "PHOTOXAL-8", "PHYSIOCLIN", "ROSAC", "SHAMPOO DS", "SHAMPOO OILY SCALP",
+  "TRAMEXAL 2%", "TRAMEXAL dec", "TRIKO FORTE SHAMPOO", "VERRUXINE GEL", "VERSIACTIVE DETERGENTE DEF",
+  "VERSIACTIVE SPRAY", "VIXAGE", "ZINCO MONODOSE", "ZOYLAK MOUSSE"
+].map(name => ({
+  name,
+  file: `/technical_sheets/${name}${name.includes("AKARISCAB Doccia") || name.includes("Exoker") ? " - technical data sheet" : (name.includes("PHOTO") || name.includes("ZINCO") || name.includes("ADIPHASE") || name.includes("CREMA INTIMA") || name.includes("ELACTIVE") || name.includes("CONTORNO") || name.includes("TRAMEXAL") ? "" : " - information sheet")}.pdf`
+})).map(item => {
+  // Fix specific filenames that don't follow the general pattern
+  if (item.name === "AKARISCAB topical treatment") item.file = "/technical_sheets/AKARISCAB topical treatment.pdf";
+  if (item.name === "PHOTOALA-5") item.file = "/technical_sheets/PHOTOALA-5.pdf";
+  if (item.name === "PHOTOXAL-8") item.file = "/technical_sheets/PHOTOXAL-8.pdf";
+  if (item.name === "ZINCO MONODOSE") item.file = "/technical_sheets/ZINCO MONODOSE - en.pdf";
+  if (item.name === "ADIPHASE CREMA") item.file = "/technical_sheets/ADIPHASE CREMA - en.pdf";
+  if (item.name === "ADIPHASE SCRUB") item.file = "/technical_sheets/ADIPHASE SCRUB - en.pdf";
+  if (item.name === "CREMA INTIMA DEF") item.file = "/technical_sheets/CREMA INTIMA DEF en.pdf";
+  if (item.name === "ELACTIVE DEF") item.file = "/technical_sheets/ELACTIVE DEF - EN.pdf";
+  if (item.name === "CONTORNO OCCHI BRADERM") item.file = "/technical_sheets/CONTORNO OCCHI BRADERM - gel 2022 - EN.pdf";
+  if (item.name === "TRAMEXAL 2%") item.file = "/technical_sheets/TRAMEXAL 2% - ac. cogico 0,7% - en.pdf";
+  if (item.name === "TRAMEXAL dec") item.file = "/technical_sheets/TRAMEXAL dec• - en.pdf";
+  if (item.name === "MICOBAT LAVANDA DEF") item.file = "/technical_sheets/MICOBAT LAVANDA DEF - en.pdf";
+  if (item.name === "MICOBAT POLVERE") item.file = "/technical_sheets/MICOBAT POLVERE - information sheet - 2024.pdf";
+  if (item.name === "HIDRANUR") item.file = "/technical_sheets/HIDRANUR - information sheet - nuova 2024 - EN.pdf";
+  if (item.name === "KERATO-FORTE") item.file = "/technical_sheets/KERATO-FORTE nuova 2020 - information sheet.pdf";
+  if (item.name === "SHAMPOO DS") item.file = "/technical_sheets/SHAMPOO DS - information sheet - NUOVO 2023.pdf";
+  if (item.name === "SHAMPOO OILY SCALP") item.file = "/technical_sheets/SHAMPOO OILY SCALP with Charcoal - information sheet.pdf";
+  if (item.name === "VERSIACTIVE SPRAY") item.file = "/technical_sheets/VERSIACTIVE SPRAY- information sheet - NUOVO 2022.pdf";
+  if (item.name === "AZEKUR") item.file = "/technical_sheets/AZEKUR - information sheet.pdf";
+  if (item.name === "CIKAVES") item.file = "/technical_sheets/CIKAVES - information sheet.pdf";
+  if (item.name === "LAKERAL") item.file = "/technical_sheets/LAKERAL - information sheet.pdf";
+  
+  return item;
+});
+
 const COUNTRIES = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"];
 
 function Logo({ light = false, size = 26 }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
+    <div className="logo-wrap" style={{ display: "flex", alignItems: "center" }}>
       <img src="/loghi/logo_braderm.png" alt="Braderm" style={{ height: size * 1.3, objectFit: "contain" }} />
-      <div style={{ width: 1, height: size * 0.8, background: light ? "rgba(255,255,255,0.2)" : "rgba(11,29,50,0.1)" }} />
+      <div className="logo-sep" style={{ width: 1, height: size * 0.8, background: light ? "rgba(255,255,255,0.2)" : "rgba(11,29,50,0.1)" }} />
       <img src="/loghi/logo_lcb.png" alt="LCB" style={{ height: size, objectFit: "contain", opacity: 0.9 }} />
     </div>
   );
@@ -220,6 +274,28 @@ function BackBtn({ onClick, label }) {
   return <button onClick={onClick} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, color: T.gold, fontSize: 13, fontWeight: 700, padding: "0 0 24px", fontFamily: FONT, textTransform: "uppercase", letterSpacing: 1 }}>← {label || "Back"}</button>;
 }
 
+const STAFF_CONTACTS = [
+  { name: "Giuseppe Braccili", email: "g.braccili@braderm.com", role: "Management" },
+  { name: "Cristiano Braccili", email: "c.braccili@braderm.com", role: "Management" },
+  { name: "Giulia Cimini", email: "laboratorio@lcblab.com", role: "Laboratories" },
+  { name: "Ludovica Coccia", email: "regolatorio@lcblab.com", role: "Regulatory" },
+  { name: "Lorenza Ferretti", email: "marketing@braderm.com", role: "Marketing" }
+];
+
+const BRADERM_PRODUCTS = [
+  "Zoylak", "AZN Crema", "Dorsak Spray", "Inoak", "Zoylak Mousse", "AZN Scrub", "Braderm A", "Azekur",
+  "Rosac", "Exoker Spray", "Exoker Shampoo", "Shampoo DS", "DS Ker Lozione", "Versiactive Spray",
+  "Versiactive Detergente", "Micobat Polvere", "MIcobat Crema Plus", "Micobat Detergente", "Micue3",
+  "Onycrom", "Distrofyd", "Carbon SEB", "Lioker Shampoo", "Triko Forte Shampoo", "Triko Plus",
+  "Kerato Forte", "Kerato Psor Detergente", "Kerato 20", "Kerato Psor Shampoo", "Tramexal",
+  "Tramexal Deco", "Verruxine Gel", "Immuxine", "Photoala 5", "Photoala 8", "Axatopic Crema",
+  "Axatopic Detergente", "Zinco Monodose", "Detergente Delicato", "Hidranur", "Lakeral", "Cikaves",
+  "Eoskin", "DGM Plus", "Kuven", "Vixage", "Collage Skin", "Contorno Occhi", "Elactive", "Oxage",
+  "Kurage", "Adiphase Scrub", "Adiphase Crema", "Micobat Lavanda", "Crema Intima", "Physicolin",
+  "Xeron", "Rinalplus", "Naresplus", "Narestop", "Otalplus", "Golyx", "Xineflus", "Zeracid",
+  "Stipactive soft", "Stipactive plus", "Lanzolact", "Sinerzym", "Noctalin", "Anxivin", "Redol ART", "Redol NEP"
+];
+
 function SectionTitle({ title, sub, center }) {
   return (
     <div style={{ marginBottom: 32, textAlign: center ? "center" : "left" }}>
@@ -238,9 +314,9 @@ function HomeMenu({ onNavigate }) {
   return (
     <div style={{ animation: "fadeUp 0.6s ease" }}>
       <div style={{ textAlign: "center", padding: "40px 0 60px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 30, marginBottom: 24 }}>
+        <div className="hero-logos" style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
           <img src="/loghi/logo_braderm.png" alt="Braderm" style={{ height: 90, objectFit: "contain" }} />
-          <div style={{ width: 1, height: 50, background: `${T.navy}10` }} />
+          <div className="logo-sep" style={{ width: 1, height: 50, background: `${T.navy}10` }} />
           <img src="/loghi/logo_lcb.png" alt="LCB" style={{ height: 70, objectFit: "contain", opacity: 0.8 }} />
         </div>
         <h1 style={{ margin: "0 0 8px", fontSize: 36, fontFamily: SERIF, color: T.navy, letterSpacing: -1 }}>Digital Brochure</h1>
@@ -267,6 +343,20 @@ function HomeMenu({ onNavigate }) {
           </div>
         ))}
       </div>
+
+      <div style={{ maxWidth: 600, margin: "0 auto 100px", textAlign: "center", animation: "fadeUp 0.8s ease forwards 0.4s", opacity: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "center", marginBottom: 20 }}>
+          <div style={{ height: 1, background: `${T.navy}15`, flex: 1 }} />
+          <span style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2, fontWeight: 700, color: T.muted }}>Certifications & Quality</span>
+          <div style={{ height: 1, background: `${T.navy}15`, flex: 1 }} />
+        </div>
+        
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
+          <img src="/certifications/certifications.png" alt="Quality Certifications" 
+               style={{ width: "100%", maxWidth: 300, height: "auto", mixBlendMode: "multiply" }} />
+        </div>
+
+      </div>
     </div>
   );
 }
@@ -276,109 +366,336 @@ function AboutSection({ onBack }) {
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => { if (entry.isIntersecting) setVisible(parseInt(entry.target.dataset.index)); });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.6 });
     const sections = document.querySelectorAll(".about-slide");
     sections.forEach(s => observer.observe(s));
     return () => sections.forEach(s => observer.unobserve(s));
   }, []);
 
-  const L = LANG.about;
-  const IMGS = ["/images/braderm-lcb.png", "/images/lcb 1.png", "/images/lcb 2.png", "/images/lcb 3.png", "/images/lcb 4.png", "/images/lcb 1.png", "/images/braderm-lcb.png"];
+  const BRADERM_COUNTRIES = [
+    { n: "Italy", c: "it" }, { n: "Austria", c: "at" }, { n: "Germany", c: "de" },
+    { n: "Romania", c: "ro" }, { n: "United Kingdom", c: "gb" }, { n: "Ukraine", c: "ua" },
+    { n: "Kuwait", c: "kw" }, { n: "Libya", c: "ly" }, { n: "Morocco", c: "ma" },
+    { n: "Greece", c: "gr" }, { n: "Cyprus", c: "cy" }, { n: "Lebanon", c: "lb" },
+    { n: "Vietnam", c: "vn" }
+  ];
+
+  const LCB_COUNTRIES = [
+    { n: "Italy", c: "it" }, { n: "United Kingdom", c: "gb" }, { n: "Spain", c: "es" },
+    { n: "USA", c: "us" }, { n: "Ukraine", c: "ua" }, { n: "Moldova", c: "md" },
+    { n: "Latvia", c: "lv" }, { n: "Lithuania", c: "lt" }, { n: "Greece", c: "gr" },
+    { n: "Cyprus", c: "cy" }, { n: "Colombia", c: "co" }, { n: "UAE", c: "ae" },
+    { n: "Saudi Arabia", c: "sa" }, { n: "Sweden", c: "se" }
+  ];
 
   return (
-    <div className="slider-container" style={{ position: "relative", background: T.navy, color: T.white, height: "100vh", overflowY: "scroll", scrollSnapType: "y mandatory", scrollBehavior: "smooth" }}>
+    <div className="about-container" style={{ position: "fixed", inset: 0, background: T.navy, color: T.white, overflowY: "scroll", scrollSnapType: "y mandatory", scrollBehavior: "smooth", zIndex: 2000 }}>
+      {/* UI OVERLAYS */}
       <div style={{ position: "fixed", top: 25, left: 25, zIndex: 100 }}>
-        <button onClick={onBack} style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)", border: `1px solid ${T.white}20`, borderRadius: "50%", width: 48, height: 48, cursor: "pointer", color: T.white, fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s" }} onMouseEnter={e => e.currentTarget.style.background = T.gold} onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}>✕</button>
+        <button onClick={onBack} style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)", border: `1px solid ${T.white}20`, borderRadius: "50%", width: 48, height: 48, cursor: "pointer", color: T.white, fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center", transition: "0.3s" }}>✕</button>
       </div>
       <div style={{ position: "fixed", right: 20, top: "50%", transform: "translateY(-50%)", display: "flex", flexDirection: "column", gap: 12, zIndex: 100 }}>
         {[...Array(7)].map((_, i) => (
           <div key={i} style={{ width: 4, height: 4, borderRadius: "50%", background: visible === i ? T.gold : `${T.white}25`, transition: "all 0.6s cubic-bezier(0.23,1,0.32,1)", transform: visible === i ? "scale(3)" : "scale(1)" }} />
         ))}
       </div>
-      <div>
-        <section data-index={0} className="about-slide" style={{ background: T.navy }}>
-          <div className="ken-burns" style={{ backgroundImage: `url(${IMGS[0]})`, opacity: 0.3, transform: visible === 0 ? "scale(1.1)" : "scale(1)" }} />
-          <div className="content-wrap" style={{ textAlign: "center", opacity: visible === 0 ? 1 : 0, transform: visible === 0 ? "translateY(0)" : "translateY(30px)" }}>
-            <h1 style={{ fontSize: "clamp(60px, 15vw, 120px)", fontFamily: SERIF, fontWeight: 900, color: T.gold, marginBottom: 10, lineHeight: 0.8 }}>{L.slide1.title}</h1>
-            <p style={{ fontSize: "clamp(18px, 4vw, 24px)", fontFamily: FONT, fontWeight: 300, letterSpacing: 4, textTransform: "uppercase", marginBottom: 60 }}>{L.slide1.sub}</p>
+
+      <div className="slides-wrapper">
+        {/* SLIDE 1: TITLE */}
+        <section data-index={0} className={`about-slide slide-dark ${visible === 0 ? "active" : ""}`} style={{ 
+          backgroundImage: 'linear-gradient(rgba(10, 25, 47, 0.85), rgba(10, 25, 47, 0.85)), url("/images/braderm-lcb.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}>
+          <div className="slide-content content-center">
+            <div className="anim-up" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, marginBottom: 30 }}>
+              <img src="/loghi/logo_braderm.png" alt="Braderm" style={{ width: "80%", maxWidth: 300, filter: "brightness(0) invert(1)" }} />
+              <img src="/loghi/logo_lcb.png" alt="LCB" style={{ width: "40%", maxWidth: 150, filter: "brightness(0) invert(1)", opacity: 0.8 }} />
+            </div>
+            <p className="anim-up delay-1" style={{ fontSize: 18, letterSpacing: 2, textTransform: "uppercase", fontWeight: 400, color: "rgba(255,255,255,0.9)" }}>Dermocosmetic Innovation Since 2007</p>
+          </div>
+          <div className="anim-up delay-3" style={{ position: "absolute", bottom: 40, left: 0, right: 0, textAlign: "center", opacity: 0.5, fontSize: 11, padding: "0 20px" }}>
+            <div>LCB S.r.l. — Laboratori Chimici Braccili</div>
+            <div>Roseto degli Abruzzi (TE), Italy</div>
           </div>
         </section>
-        <section data-index={1} className="about-slide" style={{ background: T.cream, color: T.navy }}>
-          <div className="content-wrap" style={{ textAlign: "left", opacity: visible === 1 ? 1 : 0, transform: visible === 1 ? "translateY(0)" : "translateY(30px)" }}>
-            <h2 className="slide-title" style={{ color: T.navy }}>{L.slide2.title}</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: 35 }}>
-              {L.slide2.timeline.map((t, idx) => (
-                <div key={t.year} style={{ display: "flex", gap: 20, opacity: visible === 1 ? 1 : 0 }}>
-                  <div style={{ flexShrink: 0, width: 60, height: 60, borderRadius: "50%", background: T.gold, color: T.white, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14 }}>{t.year}</div>
-                  <div>
-                    <h4 style={{ fontSize: 18, fontFamily: SERIF, margin: "0 0 6px" }}>{t.title}</h4>
-                    <p style={{ fontSize: 14, lineHeight: 1.6, color: T.muted, margin: 0 }}>{t.text}</p>
+
+        {/* SLIDE 2: STORY */}
+        <section data-index={1} className={`about-slide slide-light ${visible === 1 ? "active" : ""}`} style={{
+          backgroundImage: 'linear-gradient(rgba(249, 247, 242, 0.94), rgba(249, 247, 242, 0.94)), url("/images/lcb 2.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}>
+          <div className="slide-content content-left">
+            <h2 className="slide-title anim-up">Our Story</h2>
+            <div className="timeline">
+              {[
+                { y: "2007", t: "BRADERM IS BORN", b: "Founded in Roseto degli Abruzzi, the company enters the market with a portfolio spanning Dermatology, Gynaecology, ENT and Paediatrics.", c: T.teal },
+                { y: "2013", t: "L.C.B. LABORATORIES", b: "Laboratori Chimici Braccili: in-house R&D and manufacturing for Braderm and private-label clients.", c: T.gold },
+                { y: "TODAY", t: "A LEADER", b: "~50 products, a network across Italy, and international presence in 13+ countries.", c: T.navy }
+              ].map((item, i) => (
+                <div key={i} className={`timeline-item anim-up delay-${i + 1}`}>
+                  <div className="timeline-dot" style={{ background: item.c }}>{item.y}</div>
+                  <div className="timeline-text">
+                    <h4 style={{ color: item.c, margin: "0 0 4px", fontSize: 14, fontWeight: 800 }}>{item.t}</h4>
+                    <p style={{ margin: 0, fontSize: 12, lineHeight: 1.4, color: T.muted }}>{item.b}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="stat-row anim-up delay-4">
+              <div className="stat-card"><strong>~50</strong><span>Products</span></div>
+              <div className="stat-card"><strong>4</strong><span>Medical Areas</span></div>
+            </div>
+          </div>
+        </section>
+
+        {/* SLIDE 3: MEDICAL DEVICES */}
+        <section data-index={2} className={`about-slide slide-dark ${visible === 2 ? "active" : ""}`} style={{
+          backgroundImage: 'linear-gradient(rgba(10, 25, 47, 0.9), rgba(10, 25, 47, 0.9)), url("/images/lcb 4.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}>
+          <div className="slide-content content-center">
+            <h2 className="slide-title anim-up">Our Medical Devices</h2>
+            <p className="slide-sub anim-up delay-1">Innovative medical devices for real clinical needs</p>
+            <div className="product-list">
+              {[
+                { n: "ZOYLAK", d: "Benzoyl peroxide 4%", u: "Facial acne treatment", c: T.teal, i: "flask" },
+                { n: "DORSAK", d: "Benzoyl peroxide 6% spray", u: "Back acne treatment", c: T.gold, i: "tube" },
+                { n: "MICOBAT LAVANDA", d: "Boric Acid", u: "Feminine intimate wellness", c: T.teal, i: "sparkle" }
+              ].map((p, i) => (
+                <div key={i} className={`product-card anim-up delay-${i + 2}`}>
+                  <div className="product-accent" style={{ background: p.c }} />
+                  <div className="product-info">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <strong style={{ fontSize: 20 }}>{p.n}</strong>
+                      <Icon name={p.i} size={20} color={p.c} />
+                    </div>
+                    <div className="p-desc">{p.d}</div>
+                    <div className="p-use">{p.u}</div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         </section>
-        <section data-index={2} className="about-slide" style={{ background: T.navy }}>
-          <div className="content-wrap" style={{ textAlign: "center", opacity: visible === 2 ? 1 : 0, transform: visible === 2 ? "translateY(0)" : "translateY(30px)" }}>
-            <h2 className="slide-title">{L.slide3.title}</h2>
-            <p className="slide-sub">{L.slide3.sub}</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              {L.slide3.products.map(p => (
-                <div key={p.name} className="glass-card" style={{ opacity: visible === 2 ? 1 : 0 }}>
-                  <div style={{ fontSize: 20, fontWeight: 900, color: T.gold, fontFamily: SERIF }}>{p.name}</div>
-                  <div style={{ fontSize: 14, fontWeight: 600, margin: "4px 0" }}>{p.desc}</div>
+
+        {/* SLIDE 4: LABORATORIES */}
+        <section data-index={3} className={`about-slide slide-light ${visible === 3 ? "active" : ""}`} style={{
+          backgroundImage: 'linear-gradient(rgba(249, 247, 242, 0.94), rgba(249, 247, 242, 0.94)), url("/images/lcb 1.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}>
+          <div className="slide-content content-left">
+            <h2 className="slide-title anim-up" style={{ color: T.navy }}>Laboratori Chimici Braccili</h2>
+            <p className="anim-up delay-1" style={{ color: T.teal, fontWeight: 800, marginBottom: 20, fontSize: 14 }}>Research, Development & Manufacturing Since 2013</p>
+            <div className="glass-block anim-up delay-2">
+              L.C.B. laboratories produce both Braderm-branded products and private-label formulations, ensuring full quality control and innovation.
+            </div>
+            <div className="points-list">
+              {[
+                { t: "Advanced Research", d: "Cutting-edge formulations for the industry" },
+                { t: "Selected Ingredients", d: "Raw materials of the highest safety standards" },
+                { t: "Private Label", d: "End-to-end development for third-party brands" }
+              ].map((p, i) => (
+                <div key={i} className={`point-item anim-up delay-${i + 3}`}>
+                  <div className="point-num">{i + 1}</div>
+                  <div>
+                    <div className="point-t">{p.t}</div>
+                    <div className="point-d">{p.d}</div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </section>
-        <section data-index={3} className="about-slide" style={{ background: T.white, color: T.navy }}>
-          <div className="content-wrap" style={{ textAlign: "left", opacity: visible === 3 ? 1 : 0, transform: visible === 3 ? "translateY(0)" : "translateY(30px)" }}>
-            <h2 className="slide-title" style={{ color: T.navy }}>{L.slide4.title}</h2>
-            <p style={{ fontSize: 16, lineHeight: 1.8, color: T.muted, marginBottom: 40 }}>{L.slide4.main}</p>
+
+        {/* SLIDE 5: DISTRIBUTION */}
+        <section data-index={4} className={`about-slide slide-dark ${visible === 4 ? "active" : ""}`} style={{
+          backgroundImage: 'linear-gradient(rgba(10, 25, 47, 0.9), rgba(10, 25, 47, 0.9)), url("/images/lcb 3.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}>
+          <div className="slide-content content-left">
+            <h2 className="slide-title anim-up">Our Distribution</h2>
+            <p className="slide-sub anim-up delay-1" style={{ color: T.gold }}>A comprehensive network from local to global</p>
+            <div className="dist-list">
+              {[
+                { i: "truck", t: "Wholesalers and pharmaceutical cooperatives" },
+                { i: "shop", t: "Direct sales to pharmacies" },
+                { i: "users", t: "Medical sales representatives across Italy" },
+                { i: "globe", t: "International distributor network" }
+              ].map((d, i) => (
+                <div key={i} className={`dist-item anim-up delay-${i + 2}`}>
+                  <div className="dist-icon"><Icon name={d.i} size={20} color={T.teal} /></div>
+                  <div className="dist-t">{d.t}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mission-block anim-up delay-6">
+              Braderm works in close partnership with the medical community, ensuring a science-driven approach.
+            </div>
           </div>
         </section>
-        <section data-index={4} className="about-slide" style={{ background: T.navy }}>
-          <div className="content-wrap" style={{ textAlign: "left", opacity: visible === 4 ? 1 : 0, transform: visible === 4 ? "translateY(0)" : "translateY(30px)" }}>
-            <h2 className="slide-title">{L.slide5.title}</h2>
-            <p className="slide-sub">{L.slide5.sub}</p>
-            <p style={{ fontSize: 16, fontStyle: "italic", borderLeft: `3px solid ${T.gold}`, paddingLeft: 20, color: `${T.white}CC`, lineHeight: 1.6 }}>{L.slide5.collaboration}</p>
+
+        <section data-index={5} className={`about-slide slide-dark ${visible === 5 ? "active" : ""}`} style={{ justifyContent: "center", padding: "40px 24px" }}>
+          <div className="slide-content" style={{ width: "100%", maxWidth: 600, display: "flex", flexDirection: "column", gap: 40 }}>
+            
+            <div className="anim-up" style={{ textAlign: "center", marginBottom: 20 }}>
+              <h2 className="slide-title" style={{ color: T.gold, marginBottom: 10 }}>Our Group in the World</h2>
+              <div style={{ width: 40, height: 2, background: T.gold, margin: "0 auto", opacity: 0.5 }} />
+            </div>
+            
+            {/* BRADERM SECTION */}
+            <div className="anim-up">
+              <div style={{ display: "flex", alignItems: "center", gap: 15, marginBottom: 20 }}>
+                <img src="/loghi/logo_braderm.png" alt="Braderm" style={{ height: 32, filter: "brightness(0) invert(1)" }} />
+                <div style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: 2, fontWeight: 700, color: T.gold }}>Distributor Network</div>
+              </div>
+              <div className="marquee-container" style={{ marginLeft: 0, width: "100%" }}>
+                <div className="flag-strip" style={{ animationDuration: "25s" }}>
+                  {[...BRADERM_COUNTRIES, ...BRADERM_COUNTRIES].map((c, i) => (
+                    <div key={i} className="flag-item">
+                      <img src={`https://flagcdn.com/w40/${c.c}.png`} alt={c.n} style={{ border: c.c === 'it' ? `2px solid ${T.gold}` : "none" }} />
+                      <span style={{ fontSize: 12, whiteSpace: "nowrap" }}>{c.n}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ height: 1, background: "rgba(255,255,255,0.1)", width: "60%", margin: "0 auto" }} />
+
+            {/* LCB SECTION */}
+            <div className="anim-up delay-2">
+              <div style={{ display: "flex", alignItems: "center", gap: 15, marginBottom: 20 }}>
+                <img src="/loghi/logo_lcb.png" alt="LCB" style={{ height: 26, filter: "brightness(0) invert(1)", opacity: 0.9 }} />
+                <div style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: 2, fontWeight: 700, color: T.gold }}>Private Label Presence</div>
+              </div>
+              <div className="marquee-container" style={{ marginLeft: 0, width: "100%" }}>
+                <div className="flag-strip" style={{ animationDuration: "30s", animationDirection: "reverse" }}>
+                  {[...LCB_COUNTRIES, ...LCB_COUNTRIES].map((c, i) => (
+                    <div key={i} className="flag-item">
+                      <img src={`https://flagcdn.com/w40/${c.c}.png`} alt={c.n} style={{ border: c.c === 'it' ? `2px solid ${T.gold}` : "none" }} />
+                      <span style={{ fontSize: 12, whiteSpace: "nowrap" }}>{c.n}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
-        <section data-index={5} className="about-slide" style={{ background: T.navy }}>
-          <div className="content-wrap" style={{ textAlign: "center", opacity: visible === 5 ? 1 : 0, transform: visible === 5 ? "translateY(0)" : "translateY(30px)" }}>
-            <h2 className="slide-title">{L.slide6.title}</h2>
-            <div style={{ fontSize: "clamp(80px, 20vw, 120px)", fontWeight: 900, color: T.gold, fontFamily: SERIF, lineHeight: 1 }}>{L.slide6.stat.split(" ")[0]}</div>
+
+        {/* SLIDE 7: CLOSING */}
+        <section data-index={6} className={`about-slide slide-dark ${visible === 6 ? "active" : ""}`}>
+          <div className="accent-bar" />
+          <div className="slide-content content-center">
+            <h2 className="slide-title anim-up" style={{ fontSize: "clamp(32px, 8vw, 40px)" }}>Innovation at the Service of Health</h2>
+            <p className="anim-up delay-1" style={{ opacity: 0.7, lineHeight: 1.6, marginBottom: 40, fontSize: 14 }}>Safe, effective, and cutting-edge dermocosmetic solutions for the medical community and industry professionals.</p>
+            <div className="divider anim-up delay-2" />
+            <div className="contact-info anim-up delay-3" style={{ fontSize: 16 }}>
+              <div style={{ whiteSpace: "nowrap" }}>laboratorio@lcblab.com</div>
+              <div style={{ whiteSpace: "nowrap" }}>www.braderm.com</div>
+              <div style={{ whiteSpace: "nowrap" }}>+39 085 946 3073</div>
+            </div>
+            <Btn onClick={onBack} variant="primary" style={{ marginTop: 40, padding: "18px 40px", marginLeft: "auto", marginRight: "auto" }}>Back to Menu</Btn>
           </div>
-        </section>
-        <section data-index={6} className="about-slide" style={{ background: T.navy }}>
-          <div className="content-wrap" style={{ textAlign: "center", opacity: visible === 6 ? 1 : 0, transform: visible === 6 ? "translateY(0)" : "translateY(30px)" }}>
-            <h2 className="slide-title" style={{ fontSize: "clamp(32px, 8vw, 56px)" }}>{L.slide7.title}</h2>
-            <Btn onClick={onBack} variant="primary" style={{ padding: "18px 50px", fontSize: 16 }}>Return to Menu</Btn>
+          <div className="anim-up delay-4" style={{ position: "absolute", bottom: 40, left: 0, right: 0, textAlign: "center", opacity: 0.5, fontSize: 10, padding: "0 20px" }}>
+            LCB S.r.l. — Laboratori Chimici Braccili — Roseto degli Abruzzi (TE), Italy
           </div>
         </section>
       </div>
+
       <style>{`
-        .slider-container::-webkit-scrollbar { display: none; }
-        .about-slide { height: 100vh; display: flex; align-items: center; justify-content: center; padding: 80px 24px; box-sizing: border-box; scroll-snap-align: start; scroll-snap-stop: always; position: relative; overflow: hidden; }
-        .ken-burns { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 10s ease-out; z-index: 0; }
-        .content-wrap { position: relative; z-index: 1; width: 100%; max-width: 500px; transition: all 1s cubic-bezier(0.23,1,0.32,1); }
-        .slide-title { font-size: clamp(32px, 8vw, 56px); font-family: ${SERIF}; line-height: 1.1; margin: 0 0 25px; }
-        .slide-sub { font-size: 18px; line-height: 1.5; color: ${T.white}AA; margin-bottom: 40px; }
-        .glass-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(10px); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 12px; transition: all 0.8s ease; }
-        .slider-container { -ms-overflow-style: none; scrollbar-width: none; }
+        .about-container { -ms-overflow-style: none; scrollbar-width: none; overflow-x: hidden; width: 100vw; }
+        .about-container::-webkit-scrollbar { display: none; }
+        .about-slide { height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; scroll-snap-align: start; scroll-snap-stop: always; position: relative; overflow: hidden; padding: 80px 24px 40px; box-sizing: border-box; }
+        .slide-dark { background: ${T.navy}; color: ${T.white}; }
+        .slide-light { background: #F5F7FA; color: ${T.navy}; }
+        .slide-content { width: 100%; max-width: 450px; position: relative; z-index: 5; }
+        .content-center { text-align: center; }
+        .content-left { text-align: left; }
+        .slide-title { font-size: clamp(32px, 8vw, 38px); font-family: ${SERIF}; margin-bottom: 24px; line-height: 1.1; font-weight: 900; }
+        .slide-sub { font-size: 15px; opacity: 0.7; margin-bottom: 32px; }
+
+        /* TIMELINE */
+        .timeline { display: flex; flex-direction: column; gap: 24px; margin-bottom: 32px; position: relative; }
+        .timeline::before { content: ""; position: absolute; left: 25px; top: 0; bottom: 0; width: 2px; background: rgba(0,0,0,0.05); }
+        .timeline-item { display: flex; gap: 20px; position: relative; z-index: 2; }
+        .timeline-dot { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; color: #fff; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-transform: uppercase; }
+        .timeline-text { flex: 1; }
+        
+        .stat-row { display: flex; gap: 12px; }
+        .stat-card { flex: 1; background: #fff; padding: 16px; border-radius: 16px; boxShadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid rgba(0,0,0,0.03); }
+        .stat-card strong { display: block; fontSize: 24px; color: ${T.teal}; font-family: ${SERIF}; }
+        .stat-card span { fontSize: 10px; text-transform: uppercase; color: ${T.muted}; letter-spacing: 1px; font-weight: 700; }
+
+        /* PRODUCTS */
+        .product-list { display: flex; flex-direction: column; gap: 12px; }
+        .product-card { background: #fff; border-radius: 20px; overflow: hidden; display: flex; text-align: left; box-shadow: 0 8px 25px rgba(0,0,0,0.12); width: 100%; }
+        .product-accent { width: 6px; flex-shrink: 0; }
+        .product-info { padding: 16px 20px; flex: 1; }
+        .product-info strong { color: ${T.navy}; font-family: ${SERIF}; }
+        .p-desc { fontSize: 13px; fontWeight: 700; color: ${T.teal}; margin: 4px 0; }
+        .p-use { fontSize: 12px; color: ${T.muted}; line-height: 1.4; }
+
+        /* LABS */
+        .glass-block { background: rgba(14, 124, 123, 0.08); border: 1px solid rgba(14, 124, 123, 0.15); padding: 20px; border-radius: 20px; margin-bottom: 24px; fontSize: 14px; lineHeight: 1.6; }
+        .points-list { display: flex; flex-direction: column; gap: 16px; }
+        .point-item { display: flex; gap: 16px; align-items: flex-start; }
+        .point-num { width: 32px; height: 32px; border-radius: 50%; background: ${T.teal}; color: #fff; display: flex; align-items: center; justify-content: center; fontSize: 14px; fontWeight: 900; flex-shrink: 0; }
+        .point-t { fontWeight: 800; fontSize: 15px; margin-bottom: 2px; color: ${T.navy}; }
+        .point-d { fontSize: 13px; color: ${T.muted}; }
+
+        /* DISTRIBUTION */
+        .dist-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+        .dist-item { display: flex; align-items: center; gap: 16px; }
+        .dist-icon { width: 44px; height: 44px; border-radius: 14px; background: rgba(14, 124, 123, 0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .dist-t { fontSize: 14px; fontWeight: 500; color: rgba(255,255,255,0.9); }
+        .mission-block { border-left: 3px solid ${T.gold}; padding-left: 20px; font-style: italic; color: rgba(255,255,255,0.7); fontSize: 14px; lineHeight: 1.6; background: rgba(255,255,255,0.03); padding: 16px 20px; border-radius: 0 16px 16px 0; }
+
+        /* INTERNATIONAL */
+        .marquee-container { width: 100vw; margin-left: -24px; overflow: hidden; position: relative; }
+        .flag-strip { display: flex; gap: 2.5rem; align-items: center; animation: scroll-flags 30s linear infinite; width: max-content; padding: 10px 0; }
+        .flag-item { display: flex; align-items: center; gap: 12px; }
+        .flag-item img { height: 24px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .hq-flag { border: 2px solid ${T.gold}; }
+        @keyframes scroll-flags { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* CLOSING */
+        .accent-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: ${T.gold}; z-index: 10; }
+        .divider { width: 60px; height: 2px; background: ${T.gold}; margin: 24px auto; }
+        .contact-info { color: ${T.gold}; fontWeight: 700; display: flex; flex-direction: column; gap: 12px; }
+
+        /* ANIMATIONS */
+        .anim-up { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.23,1,0.32,1); }
+        .anim-fade { opacity: 0; transition: opacity 1.2s ease; }
+        
+        .active .anim-up, .active .anim-fade { opacity: 1; transform: translate(0); }
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+        .delay-5 { transition-delay: 0.5s; }
+        .delay-6 { transition-delay: 0.6s; }
       `}</style>
     </div>
   );
 }
 
 function LeadForm({ initialData, selected, onSubmit, onBack, title, sub, submitLabel, submitIcon, backLabel, hideBrochures }) {
-  const [f, setF] = useState(initialData || { name: "", email: "", phone: "", company: "", country: "", role: "", interest: "", notes: "" });
+  const [f, setF] = useState(initialData || { name: "", email: "", phone: "", company: "", country: "", role: "", interest: "", notes: "", products: [] });
   const [showCountries, setShowCountries] = useState(false);
   const [err, setErr] = useState("");
   const L = LANG.form;
   
+  const toggleProd = p => {
+    const list = f.products || [];
+    setF({ ...f, products: list.includes(p) ? list.filter(x => x !== p) : [...list, p] });
+  };
+
   const filteredCountries = f.country.length > 1 
     ? COUNTRIES.filter(c => c.toLowerCase().includes(f.country.toLowerCase())).slice(0, 5)
     : [];
@@ -429,8 +746,44 @@ function LeadForm({ initialData, selected, onSubmit, onBack, title, sub, submitL
              <option value="LCB (Private Label)">LCB (Private Label)</option>
           </select>
 
+          {f.interest === "Braderm (Brand Distribution)" && (
+            <div style={{ animation: "fadeIn 0.3s ease", border: `1.5px solid ${T.gold}20`, borderRadius: 16, padding: "18px", background: T.gold + "05" }}>
+               <div style={{ fontSize: 13, fontWeight: 800, color: T.gold, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+                  <Icon name="sparkle" size={16} color={T.gold} />
+                  Interested Braderm Products (Optional)
+               </div>
+               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, maxHeight: 220, overflowY: "auto", paddingRight: 8 }} className="custom-scroll">
+                  {BRADERM_PRODUCTS.map(p => {
+                    const sel = (f.products || []).includes(p);
+                    return (
+                      <div key={p} onClick={() => toggleProd(p)} style={{ 
+                        padding: "6px 12px", borderRadius: 10, fontSize: 12, fontWeight: 700, 
+                        cursor: "pointer", transition: "0.2s",
+                        background: sel ? T.gold : T.white,
+                        color: sel ? T.navy : T.muted,
+                        border: `1.5px solid ${sel ? T.gold : T.navy + "10"}`,
+                        boxShadow: sel ? `0 4px 10px ${T.gold}30` : "none"
+                      }}>
+                        {p}
+                      </div>
+                    );
+                  })}
+               </div>
+            </div>
+          )}
+
           <textarea rows="3" placeholder="Additional notes..." value={f.notes} onChange={e => setF({...f, notes: e.target.value})} style={{ width: "100%", boxSizing: "border-box", padding: "14px", borderRadius: 12, border: `1.5px solid ${T.navy}10`, fontSize: 16, fontFamily: FONT, resize: "none" }} />
           
+          {initialData && (
+            <div style={{ borderTop: `1px solid ${T.navy}05`, paddingTop: 20, marginTop: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: T.muted, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }}>Assigned To</div>
+              <select value={f.added_by || ""} onChange={e => setF({...f, added_by: e.target.value})} style={{ width: "100%", boxSizing: "border-box", padding: "14px", borderRadius: 12, border: `1.5px solid ${T.navy}10`, fontSize: 16, fontFamily: FONT, background: T.white }}>
+                <option value="Visitor">Visitor (No Staff)</option>
+                {STAFF_ACCOUNTS.map(a => <option key={a.name} value={a.name}>{a.name}</option>)}
+              </select>
+            </div>
+          )}
+
           {!hideBrochures && selected && selected.length > 0 && <div style={{ padding: "12px", background: T.gold + "10", borderRadius: 12, fontSize: 13, fontWeight: 700, color: T.gold }}>📄 {selected.length} Brochures selected</div>}
           {err && <div style={{ color: T.error, fontSize: 12, fontWeight: 700 }}>{err}</div>}
           <Btn variant="primary" type="submit" full icon={submitIcon}>{submitLabel || L.submit}</Btn>
@@ -475,19 +828,67 @@ function BrochureSection({ onBack, onLead, brochures }) {
     <div style={{ animation: "fadeUp 0.5s ease" }}>
       <BackBtn onClick={onBack} label="Back to Menu" />
       <SectionTitle title={L.title} sub={L.sub} />
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20, marginBottom: 40 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20, marginBottom: 40 }}>
         {activeBrochures.map(b => (
-          <div key={b.id} onClick={() => toggle(b.id)} style={{ background: T.cardBg, borderRadius: 24, overflow: "hidden", cursor: "pointer", border: `2px solid ${selected.includes(b.id) ? T.gold : "transparent"}`, transition: "0.3s", position: "relative" }}>
-             <div style={{ height: 180, position: "relative", overflow: "hidden" }}>
-                <img src={b.cover} alt={b.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.3), transparent)" }} />
-                {selected.includes(b.id) && <div style={{ position: "absolute", top: 15, right: 15, width: 30, height: 30, borderRadius: "50%", background: T.gold, color: T.navy, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 14, boxShadow: "0 4px 10px rgba(0,0,0,0.2)" }}>✓</div>}
-             </div>
-             <div style={{ padding: 20 }}>
-               <div style={{ fontSize: 10, fontWeight: 900, color: b.color, letterSpacing: 2, marginBottom: 5 }}>{b.line}</div>
-               <h3 style={{ fontSize: 18, fontFamily: SERIF, marginBottom: 8 }}>{b.title}</h3>
-               <p style={{ fontSize: 13, color: T.muted, lineHeight: 1.5, marginBottom: 15 }}>{b.desc}</p>
-             </div>
+          <div key={b.id} 
+            onClick={() => window.open(b.file, "_blank")}
+            style={{ 
+              background: b.color, 
+              borderRadius: 32, 
+              height: 280, 
+              padding: "35px 30px", 
+              display: "flex", 
+              flexDirection: "column", 
+              justifyContent: "space-between", 
+              cursor: "pointer", 
+              position: "relative", 
+              overflow: "hidden", 
+              boxShadow: "0 12px 40px rgba(0,0,0,0.12)", 
+              transition: "all 0.4s cubic-bezier(0.23,1,0.32,1)",
+              transform: "translateY(0)"
+            }}
+            onMouseEnter={e => e.currentTarget.style.transform = "translateY(-8px)"}
+            onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+          >
+            {/* Background Decoration */}
+            <div style={{ position: "absolute", bottom: -10, right: -10, opacity: 0.12, transform: "rotate(-10deg)" }}>
+              <img 
+                src={b.line.includes("LCB") ? "/loghi/logo_lcb.png" : "/loghi/logo_braderm.png"} 
+                alt="" 
+                style={{ height: b.line.includes("LCB") ? 180 : 130, filter: "brightness(0) invert(1)" }} 
+              />
+            </div>
+
+            <div style={{ position: "relative", zIndex: 2 }}>
+              <div style={{ fontSize: 11, fontWeight: 900, color: "rgba(255,255,255,0.7)", letterSpacing: 3, textTransform: "uppercase" }}>{b.line}</div>
+              <h3 style={{ fontSize: "clamp(28px, 4vw, 36px)", fontFamily: SERIF, color: T.white, margin: "12px 0 0", lineHeight: 1, fontWeight: 900 }}>{b.title}</h3>
+            </div>
+
+            <div style={{ position: "relative", zIndex: 2, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+              <div style={{ fontSize: 15, color: "rgba(255,255,255,0.9)", maxWidth: "75%", fontWeight: 400, fontFamily: FONT }}>{b.desc}</div>
+              <button 
+                onClick={(e) => { e.stopPropagation(); toggle(b.id); }}
+                style={{ 
+                  width: 56, 
+                  height: 56, 
+                  borderRadius: "50%", 
+                  background: selected.includes(b.id) ? T.white : "rgba(255,255,255,0.25)", 
+                  backdropFilter: "blur(10px)",
+                  border: "none", 
+                  color: selected.includes(b.id) ? b.color : T.white, 
+                  display: "flex", 
+                  alignItems: "center", 
+                  justifyContent: "center", 
+                  fontSize: 32, 
+                  fontWeight: 300,
+                  cursor: "pointer", 
+                  transition: "0.3s", 
+                  boxShadow: "0 8px 20px rgba(0,0,0,0.15)" 
+                }}
+              >
+                {selected.includes(b.id) ? "✓" : "+"}
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -504,7 +905,7 @@ function BrochureSection({ onBack, onLead, brochures }) {
 function ContactsSection({ onBack }) {
   const L = LANG.contacts;
   const save = () => {
-    const vcf = `BEGIN:VCARD\nVERSION:3.0\nFN:${COMPANY.name}\nORG:${COMPANY.name}\nTEL;TYPE=WORK,VOICE:${COMPANY.phone}\nEMAIL:${COMPANY.email}\nURL:${COMPANY.website}\nADR;TYPE=WORK:;;${COMPANY.address}\nEND:VCARD`;
+    const vcf = `BEGIN:VCARD\nVERSION:3.0\nFN:${COMPANY.name}\nORG:${COMPANY.name}\nTEL;TYPE=WORK,VOICE:${COMPANY.phone}\nTEL;TYPE=CELL,VOICE:${COMPANY.whatsapp}\nEMAIL:${COMPANY.email}\nURL:${COMPANY.websites[0]}\nURL:${COMPANY.websites[1]}\nADR;TYPE=WORK:;;${COMPANY.address}\nEND:VCARD`;
     const blob = new Blob([vcf], { type: "text/vcard" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = "LCB_Contact.vcf"; a.click();
@@ -513,13 +914,43 @@ function ContactsSection({ onBack }) {
     <div style={{ animation: "fadeUp 0.5s ease" }}>
       <BackBtn onClick={onBack} />
       <SectionTitle title={L.title} sub={L.sub} />
-      <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 500, margin: "0 auto 40px" }}>
-        {[{ icon: "📞", label: "Phone", val: COMPANY.phone, href: `tel:${COMPANY.phone}` }, { icon: "✉️", label: "Email", val: COMPANY.email, href: `mailto:${COMPANY.email}` }, { icon: "🌐", label: "Website", val: COMPANY.website.replace("https://", ""), href: COMPANY.website }, { icon: "📍", label: "Address", val: COMPANY.address, href: "https://maps.google.com/?q=" + encodeURIComponent(COMPANY.address) }].map(c => (
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 40 }}>
+        {STAFF_CONTACTS.map((s, i) => (
+          <div key={i} style={{ 
+            background: T.white, borderRadius: 20, padding: "20px 15px", textAlign: "center", 
+            boxShadow: "0 4px 15px rgba(0,0,0,0.03)", border: `1.5px solid ${T.navy}05`
+          }}>
+            <div style={{ width: 44, height: 44, borderRadius: "50%", background: T.gold + "15", color: T.gold, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", fontWeight: 800, fontSize: 14 }}>
+              {s.name.split(" ").map(n => n[0]).join("")}
+            </div>
+            <div style={{ fontWeight: 800, fontSize: 14, color: T.navy, marginBottom: 2 }}>{s.name}</div>
+            <div style={{ fontSize: 10, color: T.gold, textTransform: "uppercase", fontWeight: 700, letterSpacing: 0.5, marginBottom: 12 }}>{s.role}</div>
+            <a href={`mailto:${s.email}`} style={{ textDecoration: "none", color: T.teal, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+              <Icon name="mail" size={12} color={T.teal} />
+              EMAIL
+            </a>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginBottom: 24, fontSize: 12, fontWeight: 700, color: T.muted, textTransform: "uppercase", letterSpacing: 2, textAlign: "center" }}>Company Info</div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 500, margin: "0 auto 40px" }}>
+        {[
+          { icon: "phone", label: "Phone", val: COMPANY.phone, href: `tel:${COMPANY.phone.replace(/\s/g, "")}`, color: T.navy },
+          { icon: "whatsapp", label: "WhatsApp", val: COMPANY.whatsapp, href: `https://wa.me/${COMPANY.whatsapp.replace(/\D/g, "")}`, color: "#25D366", fill: "#25D366" },
+          { icon: "globe", label: "Braderm Website", val: COMPANY.websites[0], href: `https://${COMPANY.websites[0]}`, color: T.navy },
+          { icon: "sparkle", label: "LCB Website", val: COMPANY.websites[1], href: `https://${COMPANY.websites[1]}`, color: T.gold },
+          { icon: "mapPin", label: "Address", val: COMPANY.address, href: "https://maps.google.com/?q=" + encodeURIComponent(COMPANY.address) }
+        ].map(c => (
           <a key={c.label} href={c.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
-            <Card style={{ display: "flex", alignItems: "center", gap: 20, padding: "20px 24px" }}>
-              <div style={{ fontSize: 24 }}>{c.icon}</div>
-              <div><div style={{ fontSize: 10, fontWeight: 900, color: T.gold, textTransform: "uppercase" }}>{c.label}</div><div style={{ fontSize: 16, fontWeight: 800, color: T.navy }}>{c.val}</div></div>
-            </Card>
+            <div style={{ background: T.white, borderRadius: 20, display: "flex", alignItems: "center", gap: 16, padding: "14px 20px", boxShadow: "0 2px 8px rgba(0,0,0,0.02)", border: `1px solid ${T.navy}03` }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: (c.color || T.gold) + "08", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Icon name={c.icon} size={18} color={c.color || T.gold} fill={c.fill || "none"} strokeWidth={c.icon === 'whatsapp' ? 0 : 2} />
+              </div>
+              <div style={{ flex: 1 }}><div style={{ fontSize: 9, fontWeight: 800, color: T.gold, textTransform: "uppercase", letterSpacing: 1 }}>{c.label}</div><div style={{ fontSize: 13, fontWeight: 700, color: T.navy }}>{c.val}</div></div>
+              <div style={{ color: T.gold, opacity: 0.5, fontSize: 16 }}>→</div>
+            </div>
           </a>
         ))}
       </div>
@@ -545,7 +976,9 @@ function StaffDashboard({ leads, brochures, onToggleBrochure, onAddLead, onUpdat
   const [tab, setTab] = useState("leads");
   const [showAdd, setShowAdd] = useState(false);
   const [editItem, setEditItem] = useState(null);
+  const [viewItem, setViewItem] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [techSearch, setTechSearch] = useState("");
   const L = LANG.staff;
   
   const totalToday = leads.filter(l => new Date(l.created_at || l.date).toDateString() === new Date().toDateString()).length;
@@ -568,7 +1001,6 @@ function StaffDashboard({ leads, brochures, onToggleBrochure, onAddLead, onUpdat
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "#F8F9FA", zIndex: 5000, display: "flex", flexDirection: "column", fontFamily: FONT }}>
-       {/* PREMIUM HEADER */}
        <header style={{ background: T.navy, color: T.white, padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
              <Logo light size={18} />
@@ -577,9 +1009,8 @@ function StaffDashboard({ leads, brochures, onToggleBrochure, onAddLead, onUpdat
           <button onClick={onClose} style={{ background: T.gold, border: "none", color: T.navy, padding: "8px 16px", borderRadius: 10, fontWeight: 800, fontSize: 12, cursor: "pointer" }}>EXIT</button>
        </header>
 
-       {/* TABS CONTROLLER */}
        <div style={{ background: T.white, display: "flex", padding: "0 10px" }}>
-          {["leads", "inventory"].map(t => (
+          {["leads", "inventory", "technical", "reports"].map(t => (
             <button key={t} onClick={() => setTab(t)} style={{ flex: 1, padding: "16px", border: "none", background: "none", color: tab === t ? T.navy : T.muted, fontWeight: 800, fontSize: 12, textTransform: "uppercase", borderBottom: `3px solid ${tab === t ? T.gold : "transparent"}`, transition: "0.3s" }}>{t}</button>
           ))}
        </div>
@@ -587,7 +1018,6 @@ function StaffDashboard({ leads, brochures, onToggleBrochure, onAddLead, onUpdat
        <main style={{ flex: 1, overflow: "auto", padding: "20px" }}>
           {tab === "leads" && (
             <div style={{ maxWidth: 800, margin: "0 auto" }}>
-               {/* QUICK STATS */}
                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 15, marginBottom: 25 }}>
                   <div style={{ background: T.white, padding: 15, borderRadius: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
                      <div style={{ fontSize: 11, color: T.muted, fontWeight: 700, textTransform: "uppercase" }}>Total Leads</div>
@@ -609,7 +1039,7 @@ function StaffDashboard({ leads, brochures, onToggleBrochure, onAddLead, onUpdat
                ) : (
                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     {leads.map((l, i) => (
-                      <div key={i} style={{ background: T.white, padding: 15, borderRadius: 16, boxShadow: "0 2px 6px rgba(0,0,0,0.03)", display: "flex", gap: 15, animation: "fadeIn 0.3s ease" }}>
+                      <div key={i} onClick={() => setViewItem(l)} style={{ background: T.white, padding: 15, borderRadius: 16, boxShadow: "0 2px 6px rgba(0,0,0,0.03)", display: "flex", gap: 15, animation: "fadeIn 0.3s ease", cursor: "pointer" }}>
                          <div style={{ width: 45, height: 45, borderRadius: 12, background: T.navy + "08", color: T.navy, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14 }}>{getInitials(l.name)}</div>
                          <div style={{ flex: 1 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -628,10 +1058,10 @@ function StaffDashboard({ leads, brochures, onToggleBrochure, onAddLead, onUpdat
                                   {(l.brochures || []).map(id => <span key={id} style={{ background: T.navy + "05", color: T.navy, padding: "2px 8px", borderRadius: 4, fontSize: 9, fontWeight: 700 }}>{brochures.find(x => x.id === id)?.line || "Docs"}</span>)}
                                </div>
                                <div style={{ display: "flex", gap: 12 }}>
-                                  <button onClick={() => setEditItem(l)} style={{ background: "none", border: "none", cursor: "pointer", opacity: 0.5, color: T.navy }}>
+                                  <button onClick={(e) => { e.stopPropagation(); setEditItem(l); }} style={{ background: "none", border: "none", cursor: "pointer", opacity: 0.5, color: T.navy }}>
                                      <Icon name="edit" size={18} />
                                   </button>
-                                  <button onClick={() => setDeleteId(l.id)} style={{ background: "none", border: "none", cursor: "pointer", opacity: 0.5, color: T.error }}>
+                                  <button onClick={(e) => { e.stopPropagation(); setDeleteId(l.id); }} style={{ background: "none", border: "none", cursor: "pointer", opacity: 0.5, color: T.error }}>
                                      <Icon name="trash" size={18} />
                                   </button>
                                </div>
@@ -668,9 +1098,97 @@ function StaffDashboard({ leads, brochures, onToggleBrochure, onAddLead, onUpdat
                </div>
             </div>
           )}
+
+          {tab === "technical" && (
+            <div style={{ maxWidth: 600, margin: "0 auto" }}>
+               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                  <h2 style={{ fontSize: 18, fontFamily: SERIF, margin: 0 }}>Technical Data Sheets</h2>
+                  <div style={{ position: "relative", width: 220 }}>
+                    <div style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", opacity: 0.3 }}>
+                      <Icon name="search" size={14} color={T.navy} />
+                    </div>
+                    <input 
+                      placeholder="Search product..." 
+                      value={techSearch}
+                      onChange={e => setTechSearch(e.target.value)}
+                      style={{ width: "100%", padding: "10px 12px 10px 32px", borderRadius: 12, border: `1.5px solid ${T.navy}15`, fontSize: 12, outline: "none", background: T.white }}
+                    />
+                  </div>
+               </div>
+               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {TECHNICAL_SHEETS.filter(s => s.name.toLowerCase().includes(techSearch.toLowerCase())).map((s, i) => (
+                    <div key={i} onClick={() => window.open(s.file, "_blank")} 
+                         style={{ background: T.white, display: "flex", alignItems: "center", gap: 12, padding: "14px 20px", borderRadius: 16, boxShadow: "0 2px 6px rgba(0,0,0,0.03)", cursor: "pointer" }}
+                         onMouseEnter={e => e.currentTarget.style.background = "#fcfcfc"}
+                         onMouseLeave={e => e.currentTarget.style.background = T.white}>
+                       <div style={{ width: 36, height: 36, borderRadius: 10, background: T.teal + "10", color: T.teal, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <Icon name="file" size={18} />
+                       </div>
+                       <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: 800, fontSize: 14, color: T.navy }}>{s.name}</div>
+                          <div style={{ fontSize: 10, color: T.muted, textTransform: "uppercase", letterSpacing: 0.5 }}>Technical Sheet • PDF</div>
+                       </div>
+                       <div style={{ color: T.gold }}><Icon name="chevronRight" size={16} /></div>
+                    </div>
+                  ))}
+                  {TECHNICAL_SHEETS.filter(s => s.name.toLowerCase().includes(techSearch.toLowerCase())).length === 0 && (
+                    <div style={{ textAlign: "center", padding: 40, color: T.muted, fontSize: 14 }}>No data sheets found.</div>
+                  )}
+               </div>
+            </div>
+          )}
+
+          {tab === "reports" && (
+            <div style={{ maxWidth: 800, margin: "0 auto", animation: "fadeIn 0.5s ease" }}>
+               <h2 style={{ fontSize: 24, fontFamily: SERIF, marginBottom: 25, color: T.navy }}>Fair Performance Report</h2>
+               
+               <div style={{ marginBottom: 30 }}>
+                  <Card style={{ padding: 25 }}>
+                     <h3 style={{ fontSize: 14, fontWeight: 800, color: T.muted, marginBottom: 20, textTransform: "uppercase", letterSpacing: 1 }}>Interest Distribution</h3>
+                     <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
+                        {["Braderm", "LCB"].map(type => {
+                           const count = leads.filter(l => l.interest && l.interest.includes(type)).length;
+                           const pct = leads.length > 0 ? (count / leads.length) * 100 : 0;
+                           return (
+                             <div key={type}>
+                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 12, fontWeight: 700 }}>
+                                   <span>{type} {type === "Braderm" ? "Brand" : "Private Label"}</span>
+                                   <span>{count} ({Math.round(pct)}%)</span>
+                                </div>
+                                <div style={{ height: 10, background: "#eee", borderRadius: 5, overflow: "hidden" }}>
+                                   <div style={{ height: "100%", width: `${pct}%`, background: type === "Braderm" ? T.gold : T.teal, borderRadius: 5, transition: "width 1s ease" }} />
+                                </div>
+                             </div>
+                           );
+                        })}
+                     </div>
+                  </Card>
+               </div>
+
+               <Card style={{ padding: 25, marginBottom: 30 }}>
+                  <h3 style={{ fontSize: 14, fontWeight: 800, color: T.muted, marginBottom: 20, textTransform: "uppercase", letterSpacing: 1 }}>Global Reach (By Country)</h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 20 }}>
+                     {Object.entries(leads.reduce((acc, l) => {
+                        const c = l.country || "Unknown";
+                        acc[c] = (acc[c] || 0) + 1;
+                        return acc;
+                     }, {})).sort((a,b) => b[1] - a[1]).slice(0, 10).map(([country, count]) => (
+                       <div key={country} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 15px", background: "#fcfcfc", borderRadius: 12, border: "1px solid #f0f0f0" }}>
+                          <div style={{ width: 32, height: 32, borderRadius: "50%", background: T.gold + "10", color: T.gold, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 10 }}>{count}</div>
+                          <div style={{ fontWeight: 700, fontSize: 13, color: T.navy }}>{country}</div>
+                       </div>
+                     ))}
+                  </div>
+               </Card>
+
+               <div style={{ textAlign: "center", padding: 40, border: `2px dashed ${T.navy}10`, borderRadius: 24, background: T.white }}>
+                  <Icon name="globe" size={40} color={T.navy} style={{ opacity: 0.1, marginBottom: 15 }} />
+                  <div style={{ fontSize: 13, color: T.muted, fontWeight: 600 }}>Detailed analytics and data exports available in the CSV export.</div>
+               </div>
+            </div>
+          )}
        </main>
 
-       {/* FLOATING ACTION BUTTON */}
        {tab === "leads" && (
          <button onClick={() => setShowAdd(true)} style={{ position: "fixed", bottom: 25, right: 25, width: 60, height: 60, borderRadius: "50%", background: T.navy, color: T.white, border: "none", fontSize: 24, boxShadow: "0 8px 25px rgba(11,29,50,0.3)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 6000 }}>+</button>
        )}
@@ -697,6 +1215,88 @@ function StaffDashboard({ leads, brochures, onToggleBrochure, onAddLead, onUpdat
                <LeadForm initialData={editItem} submitLabel="UPDATE" onSubmit={d => { onUpdateLead(editItem.id, d); setEditItem(null); }} />
             </div>
          </div>
+       )}
+
+       {viewItem && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(10px)", zIndex: 7000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+             <div style={{ background: T.white, width: "100%", maxWidth: 500, borderRadius: 32, overflow: "auto", maxHeight: "90vh", boxShadow: "0 30px 70px rgba(0,0,0,0.4)", animation: "fadeUp 0.3s ease" }}>
+                <div style={{ background: T.navy, padding: "25px 30px", color: T.white, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                   <div>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: T.gold, textTransform: "uppercase", letterSpacing: 2, marginBottom: 4 }}>Lead Details</div>
+                      <h3 style={{ fontFamily: SERIF, margin: 0, fontSize: 24 }}>{viewItem.name}</h3>
+                   </div>
+                   <button onClick={() => setViewItem(null)} style={{ border: "none", background: "rgba(255,255,255,0.1)", color: T.white, width: 36, height: 36, borderRadius: "50%", cursor: "pointer" }}>✕</button>
+                </div>
+                
+                <div style={{ padding: 30 }}>
+                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 30 }}>
+                      <div>
+                         <div style={{ fontSize: 10, fontWeight: 800, color: T.muted, textTransform: "uppercase", marginBottom: 5 }}>Email</div>
+                         <a href={`mailto:${viewItem.email}`} style={{ color: T.teal, fontWeight: 700, fontSize: 14, textDecoration: "none" }}>{viewItem.email}</a>
+                      </div>
+                      <div>
+                         <div style={{ fontSize: 10, fontWeight: 800, color: T.muted, textTransform: "uppercase", marginBottom: 5 }}>Phone</div>
+                         <a href={`tel:${viewItem.phone}`} style={{ color: T.navy, fontWeight: 700, fontSize: 14, textDecoration: "none" }}>{viewItem.phone || "—"}</a>
+                      </div>
+                      <div>
+                         <div style={{ fontSize: 10, fontWeight: 800, color: T.muted, textTransform: "uppercase", marginBottom: 5 }}>Company</div>
+                         <div style={{ color: T.navy, fontWeight: 700, fontSize: 14 }}>{viewItem.company || "Private"}</div>
+                      </div>
+                      <div>
+                         <div style={{ fontSize: 10, fontWeight: 800, color: T.muted, textTransform: "uppercase", marginBottom: 5 }}>Country</div>
+                         <div style={{ color: T.navy, fontWeight: 700, fontSize: 14 }}>{viewItem.country || "—"}</div>
+                      </div>
+                   </div>
+
+                   <div style={{ marginBottom: 25 }}>
+                      <div style={{ fontSize: 10, fontWeight: 800, color: T.muted, textTransform: "uppercase", marginBottom: 8 }}>Primary Interest</div>
+                      <div style={{ display: "inline-block", background: T.gold + "15", color: T.gold, padding: "6px 14px", borderRadius: 10, fontWeight: 800, fontSize: 12 }}>{viewItem.interest || "General Inquiry"}</div>
+                   </div>
+
+                   {viewItem.products && viewItem.products.length > 0 && (
+                      <div style={{ marginBottom: 25 }}>
+                         <div style={{ fontSize: 10, fontWeight: 800, color: T.muted, textTransform: "uppercase", marginBottom: 8 }}>Interested Products</div>
+                         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                            {viewItem.products.map(p => <span key={p} style={{ background: T.teal + "08", color: T.teal, padding: "4px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700, border: `1px solid ${T.teal}15` }}>{p}</span>)}
+                         </div>
+                      </div>
+                   )}
+
+                   {viewItem.brochures && viewItem.brochures.length > 0 && (
+                      <div style={{ marginBottom: 25 }}>
+                         <div style={{ fontSize: 10, fontWeight: 800, color: T.muted, textTransform: "uppercase", marginBottom: 8 }}>Requested Brochures</div>
+                         <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                            {viewItem.brochures.map(id => {
+                               const b = brochures.find(x => x.id === id);
+                               return (
+                                 <div key={id} style={{ fontSize: 13, color: T.navy, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+                                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.gold }} />
+                                    {b ? b.title : id}
+                                 </div>
+                               );
+                            })}
+                         </div>
+                      </div>
+                   )}
+
+                   {viewItem.notes && (
+                      <div style={{ marginBottom: 25, padding: 15, background: "#F8F9FA", borderRadius: 16, borderLeft: `4px solid ${T.gold}` }}>
+                         <div style={{ fontSize: 10, fontWeight: 800, color: T.muted, textTransform: "uppercase", marginBottom: 5 }}>Internal Notes</div>
+                         <div style={{ fontSize: 13, color: T.navy, lineHeight: 1.5 }}>{viewItem.notes}</div>
+                      </div>
+                   )}
+
+                   <div style={{ borderTop: `1px solid ${T.navy}05`, paddingTop: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div style={{ fontSize: 11, color: T.muted }}>Added: <b>{new Date(viewItem.created_at || viewItem.date).toLocaleString()}</b></div>
+                      <div style={{ fontSize: 11, color: T.gold, fontWeight: 800 }}>BY: {viewItem.added_by || "Visitor"}</div>
+                   </div>
+                </div>
+                
+                <div style={{ padding: "0 30px 30px" }}>
+                   <Btn onClick={() => { setEditItem(viewItem); setViewItem(null); }} variant="primary" full icon="✎">EDIT LEAD DATA</Btn>
+                </div>
+             </div>
+          </div>
        )}
 
        {deleteId && (
@@ -754,6 +1354,12 @@ export default function LCBFairApp() {
   const [leads, setLeads] = useState([]);
   const [brochures, setBrochures] = useState(BROCHURES_INITIAL);
   
+  // Update Theme Color for mobile status bar
+  useEffect(() => {
+    const color = page === "about" ? T.navy : T.cream;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", color);
+  }, [page]);
+  
   // Login State
   const [loginForm, setLoginForm] = useState({ email: "", pass: "" });
   const [loginErr, setLoginErr] = useState("");
@@ -788,7 +1394,8 @@ export default function LCBFairApp() {
   };
 
   const addLead = async (d) => {
-    const leadData = { ...d, added_by: currentUser || "Visitor", created_at: new Date().toISOString() };
+    // If d already has added_by (from staff dashboard), use it. Otherwise use "Visitor".
+    const leadData = { ...d, added_by: d.added_by || "Visitor", created_at: new Date().toISOString() };
     
     // 1. Optimistic Local Update
     setLeads(p => [leadData, ...p]);
@@ -805,6 +1412,7 @@ export default function LCBFairApp() {
         role: d.role,
         interest: d.interest,
         notes: d.notes,
+        products: d.products,
         brochures: d.brochures,
         added_by: leadData.added_by,
         type: d.type || 'brochure_request'
@@ -916,7 +1524,7 @@ export default function LCBFairApp() {
         </div>
       );
     }
-    return <StaffDashboard leads={leads} brochures={brochures} onToggleBrochure={toggleBrochure} onAddLead={addLead} onUpdateLead={updateLead} onDeleteLead={deleteLead} onClose={logout} />;
+    return <StaffDashboard leads={leads} brochures={brochures} onToggleBrochure={toggleBrochure} onAddLead={d => addLead({...d, added_by: currentUser})} onUpdateLead={updateLead} onDeleteLead={deleteLead} onClose={logout} />;
   }
 
   // --- VISITOR VIEW ---
@@ -927,13 +1535,18 @@ export default function LCBFairApp() {
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         * { box-sizing: border-box; }
         body { margin: 0; padding: 0; }
+        .hero-logos { gap: 30px; }
+        .logo-wrap { gap: 15px; }
+        .logo-sep { margin: 0 5px; }
+        @media (max-width: 600px) {
+          .hero-logos { gap: 12px; }
+          .logo-wrap { gap: 8px; }
+          .hero-logos img:first-child { height: 70px !important; }
+          .hero-logos img:last-child { height: 55px !important; }
+          .hero-logos .logo-sep { height: 40px !important; }
+        }
       `}</style>
       
-      {page !== "about" && (
-        <header style={{ position: "sticky", top: 0, zIndex: 1000, background: T.navy, padding: "15px 25px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-           <div onClick={() => setPage("home")} style={{ cursor: "pointer" }}><Logo light size={24} /></div>
-        </header>
-      )}
 
       <main style={page === "about" ? {} : { maxWidth: 900, margin: "0 auto", padding: "30px 20px 100px" }}>
         {page === "home" && <HomeMenu onNavigate={setPage} />}
