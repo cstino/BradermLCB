@@ -196,45 +196,61 @@ const BROCHURES_INITIAL = [
 ];
 
 const TECHNICAL_SHEETS = [
-  "ADIPHASE CREMA", "ADIPHASE SCRUB", "AKARISCAB Doccia shampoo", "AKARISCAB topical treatment",
-  "AXATOPIC CREMA", "AXATOPIC DETERGENTE", "AZEKUR", "AZN CREMA", "AZN SCRUB", "CIKAVES",
-  "CONTORNO OCCHI BRADERM", "CREMA INTIMA DEF", "D.G.M. PLUS", "DETERGENTE DELICATO DEF",
-  "DISTROFYD", "DORSAK", "ELACTIVE DEF", "Exoker Doccia shampoo", "Exoker Spray",
-  "HIDRANUR", "KERATO 20", "KERATO PSOR DETERGENTE", "KERATO PSOR SHAMPOO", "KERATO-FORTE",
-  "KURAC DEF (ZOYLAK)", "KURAGE 2024", "LAKERAL", "LIOKER SHAMPOO", "MICOBAT CREMA",
-  "MICOBAT DETERGENTE", "MICOBAT LAVANDA DEF", "MICOBAT POLVERE", "ONYCROM", "OXAGE 2024",
-  "PHOTOALA-5", "PHOTOXAL-8", "PHYSIOCLIN", "ROSAC", "SHAMPOO DS", "SHAMPOO OILY SCALP",
-  "TRAMEXAL 2%", "TRAMEXAL dec", "TRIKO FORTE SHAMPOO", "VERRUXINE GEL", "VERSIACTIVE DETERGENTE DEF",
-  "VERSIACTIVE SPRAY", "VIXAGE", "ZINCO MONODOSE", "ZOYLAK MOUSSE"
-].map(name => ({
-  name,
-  file: `/technical_sheets/${name}${name.includes("AKARISCAB Doccia") || name.includes("Exoker") ? " - technical data sheet" : (name.includes("PHOTO") || name.includes("ZINCO") || name.includes("ADIPHASE") || name.includes("CREMA INTIMA") || name.includes("ELACTIVE") || name.includes("CONTORNO") || name.includes("TRAMEXAL") ? "" : " - information sheet")}.pdf`
-})).map(item => {
-  // Fix specific filenames that don't follow the general pattern
-  if (item.name === "AKARISCAB topical treatment") item.file = "/technical_sheets/AKARISCAB topical treatment.pdf";
-  if (item.name === "PHOTOALA-5") item.file = "/technical_sheets/PHOTOALA-5.pdf";
-  if (item.name === "PHOTOXAL-8") item.file = "/technical_sheets/PHOTOXAL-8.pdf";
-  if (item.name === "ZINCO MONODOSE") item.file = "/technical_sheets/ZINCO MONODOSE - en.pdf";
-  if (item.name === "ADIPHASE CREMA") item.file = "/technical_sheets/ADIPHASE CREMA - en.pdf";
-  if (item.name === "ADIPHASE SCRUB") item.file = "/technical_sheets/ADIPHASE SCRUB - en.pdf";
-  if (item.name === "CREMA INTIMA DEF") item.file = "/technical_sheets/CREMA INTIMA DEF en.pdf";
-  if (item.name === "ELACTIVE DEF") item.file = "/technical_sheets/ELACTIVE DEF - EN.pdf";
-  if (item.name === "CONTORNO OCCHI BRADERM") item.file = "/technical_sheets/CONTORNO OCCHI BRADERM - gel 2022 - EN.pdf";
-  if (item.name === "TRAMEXAL 2%") item.file = "/technical_sheets/TRAMEXAL 2% - ac. cogico 0,7% - en.pdf";
-  if (item.name === "TRAMEXAL dec") item.file = "/technical_sheets/TRAMEXAL dec• - en.pdf";
-  if (item.name === "MICOBAT LAVANDA DEF") item.file = "/technical_sheets/MICOBAT LAVANDA DEF - en.pdf";
-  if (item.name === "MICOBAT POLVERE") item.file = "/technical_sheets/MICOBAT POLVERE - information sheet - 2024.pdf";
-  if (item.name === "HIDRANUR") item.file = "/technical_sheets/HIDRANUR - information sheet - nuova 2024 - EN.pdf";
-  if (item.name === "KERATO-FORTE") item.file = "/technical_sheets/KERATO-FORTE nuova 2020 - information sheet.pdf";
-  if (item.name === "SHAMPOO DS") item.file = "/technical_sheets/SHAMPOO DS - information sheet - NUOVO 2023.pdf";
-  if (item.name === "SHAMPOO OILY SCALP") item.file = "/technical_sheets/SHAMPOO OILY SCALP with Charcoal - information sheet.pdf";
-  if (item.name === "VERSIACTIVE SPRAY") item.file = "/technical_sheets/VERSIACTIVE SPRAY- information sheet - NUOVO 2022.pdf";
-  if (item.name === "AZEKUR") item.file = "/technical_sheets/AZEKUR - information sheet.pdf";
-  if (item.name === "CIKAVES") item.file = "/technical_sheets/CIKAVES - information sheet.pdf";
-  if (item.name === "LAKERAL") item.file = "/technical_sheets/LAKERAL - information sheet.pdf";
-  
-  return item;
-});
+  { name: "ADIPHASE CREMA", file: "/technical_sheets/ADIPHASE_CREMA_-_en.pdf" },
+  { name: "ADIPHASE SCRUB", file: "/technical_sheets/ADIPHASE_SCRUB_-_en.pdf" },
+  { name: "AKARISCAB Doccia shampoo", file: "/technical_sheets/AKARISCAB_Doccia_shampoo_-_technical_data_sheet.pdf" },
+  { name: "AKARISCAB topical treatment", file: "/technical_sheets/AKARISCAB_topical_treatment.pdf" },
+  { name: "AXATOPIC CREMA", file: "/technical_sheets/AXATOPIC_CREMA_information_sheet.pdf" },
+  { name: "AXATOPIC DETERGENTE", file: "/technical_sheets/AXATOPIC_DETERGENTE_information_sheet.pdf" },
+  { name: "AZEKUR", file: "/technical_sheets/AZEKUR_-_information_sheet.pdf" },
+  { name: "AZN CREMA", file: "/technical_sheets/AZN_CREMA_information_sheet.pdf" },
+  { name: "AZN SCRUB", file: "/technical_sheets/AZN_SCRUB_information_sheet.pdf" },
+  { name: "CIKAVES", file: "/technical_sheets/CIKAVES_-_information_sheet.pdf" },
+  { name: "CONTORNO OCCHI BRADERM", file: "/technical_sheets/CONTORNO_OCCHI_BRADERM_-_gel_2022_-_EN.pdf" },
+  { name: "CREMA INTIMA DEF", file: "/technical_sheets/CREMA_INTIMA_DEF_en.pdf" },
+  { name: "D.G.M. PLUS", file: "/technical_sheets/D.G.M._PLUS_-_information_sheet.pdf" },
+  { name: "DETERGENTE DELICATO", file: "/technical_sheets/DETERGENTE__DELICATO_DEF_-_information_sheet.pdf" },
+  { name: "DISINFECTANT - EOSKIN", file: "/technical_sheets/DISINFECTANT-_EOSKIN.pdf" },
+  { name: "DISTROFYD", file: "/technical_sheets/DISTROFYD_information_sheet.pdf" },
+  { name: "DORSAK", file: "/technical_sheets/DORSAK_information_sheet.pdf" },
+  { name: "EAR CARE PRODUCTS", file: "/technical_sheets/EAR_CARE_PRODUCTS.pdf" },
+  { name: "ELACTIVE DEF", file: "/technical_sheets/ELACTIVE_DEF_-_EN.pdf" },
+  { name: "Exoker Doccia shampoo", file: "/technical_sheets/Exoker_Doccia_shampoo_-_technical_data_sheet.pdf" },
+  { name: "Exoker Spray", file: "/technical_sheets/Exoker_Spray_-_technical_data_sheet.pdf" },
+  { name: "GASTROENTEROLOGY", file: "/technical_sheets/GASTROENTEROLOGY.pdf" },
+  { name: "HIDRANUR", file: "/technical_sheets/HIDRANUR_-_information_sheet_-_nuova_2024_-_EN.pdf" },
+  { name: "KERATO-FORTE", file: "/technical_sheets/KERATO-FORTE_nuova_2020_-_information_sheet.pdf" },
+  { name: "KERATO 20", file: "/technical_sheets/KERATO_20_-_information_sheet.pdf" },
+  { name: "KERATO PSOR DETERGENTE", file: "/technical_sheets/KERATO_PSOR_DETERGENTE_-_information_sheet.pdf" },
+  { name: "KERATO PSOR SHAMPOO", file: "/technical_sheets/KERATO_PSOR_SHAMPOO_-_information_sheet.pdf" },
+  { name: "KURAC DEF (ZOYLAK)", file: "/technical_sheets/KURAC_DEF__ZOYLAK__-_information_sheet.pdf" },
+  { name: "KURAGE 2024", file: "/technical_sheets/KURAGE_2024_-_information_sheet.pdf" },
+  { name: "LAKERAL", file: "/technical_sheets/LAKERAL_-_information_sheet.pdf" },
+  { name: "LIOKER SHAMPOO", file: "/technical_sheets/LIOKER_SHAMPOO_-_information_sheet.pdf" },
+  { name: "MICOBAT CREMA", file: "/technical_sheets/MICOBAT_CREMA_information_sheet.pdf" },
+  { name: "MICOBAT DETERGENTE", file: "/technical_sheets/MICOBAT_DETERGENTE_-_information_sheet.pdf" },
+  { name: "MICOBAT LAVANDA DEF", file: "/technical_sheets/MICOBAT_LAVANDA_DEF_-_en.pdf" },
+  { name: "MICOBAT POLVERE", file: "/technical_sheets/MICOBAT_POLVERE_-_information_sheet_-_2024.pdf" },
+  { name: "MOUTH PRODUCT", file: "/technical_sheets/MOUTH_PRODUCT.pdf" },
+  { name: "NOSE PRODUCTS", file: "/technical_sheets/NOSE_PRODUCTS_.pdf" },
+  { name: "ONYCROM", file: "/technical_sheets/ONYCROM_information_sheet.pdf" },
+  { name: "OXAGE 2024", file: "/technical_sheets/OXAGE_2024_-_information_sheet.pdf" },
+  { name: "PHOTOALA-5", file: "/technical_sheets/PHOTOALA-5.pdf" },
+  { name: "PHOTOXAL-8", file: "/technical_sheets/PHOTOXAL-8.pdf" },
+  { name: "PHYSIOCLIN", file: "/technical_sheets/PHYSIOCLIN_-_information_sheet.pdf" },
+  { name: "ROSAC", file: "/technical_sheets/ROSAC_-_information_sheet.pdf" },
+  { name: "SHAMPOO DS", file: "/technical_sheets/SHAMPOO_DS_-_information_sheet_-_NUOVO_2023.pdf" },
+  { name: "SHAMPOO OILY SCALP", file: "/technical_sheets/SHAMPOO_OILY_SCALP_with_Charcoal_-_information_sheet.pdf" },
+  { name: "TRAMEXAL 2%", file: "/technical_sheets/TRAMEXAL_2__-_ac._cogico_0_7__-_en.pdf" },
+  { name: "TRAMEXAL dec", file: "/technical_sheets/TRAMEXAL_dec__-_en.pdf" },
+  { name: "TRIKO FORTE SHAMPOO", file: "/technical_sheets/TRIKO_FORTE_SHAMPOO_-_information_sheet.pdf" },
+  { name: "VERRUXINE GEL", file: "/technical_sheets/VERRUXINE_GEL_information_sheet.pdf" },
+  { name: "VERSIACTIVE DETERGENTE", file: "/technical_sheets/VERSIACTIVE_DETERGENTE_DEF_-_information_sheet.pdf" },
+  { name: "VERSIACTIVE SPRAY", file: "/technical_sheets/VERSIACTIVE_SPRAY-_information_sheet_-_NUOVO_2022.pdf" },
+  { name: "VIXAGE", file: "/technical_sheets/VIXAGE_-_information_sheet.pdf" },
+  { name: "ZINCO MONODOSE", file: "/technical_sheets/ZINCO_MONODOSE_-_en.pdf" },
+  { name: "ZOYLAK MOUSSE", file: "/technical_sheets/ZOYLAK_MOUSSE_-_information_sheet.pdf" }
+];
 
 const COUNTRIES = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"];
 
@@ -1193,7 +1209,7 @@ function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAdd
                {(() => {
                   const firstName = (currentUser || "").split(" ")[0];
                   const folder = (currentUser || "").replace(/\s+/g, "_");
-                  const badge = `/addetti/${folder}/badge/badge ${firstName.toLowerCase()}.pdf`;
+                  const badge = `/addetti/${folder}/badge/badge_${firstName.toLowerCase()}.pdf`;
                   const flight = `/addetti/${folder}/biglietti_aereo/BP_${firstName}.pdf`;
                   
                   return (
