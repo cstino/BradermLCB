@@ -1025,11 +1025,13 @@ function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAdd
           <button onClick={onClose} style={{ background: T.gold, border: "none", color: T.navy, padding: "8px 16px", borderRadius: 10, fontWeight: 800, fontSize: 12, cursor: "pointer" }}>EXIT</button>
        </header>
 
-       <div style={{ background: T.white, display: "flex", padding: "0 10px" }}>
-          {["leads", "inventory", "technical", "reports", "my_pass"].map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{ flex: 1, padding: "16px", border: "none", background: "none", color: tab === t ? T.navy : T.muted, fontWeight: 800, fontSize: 12, textTransform: "uppercase", borderBottom: `3px solid ${tab === t ? T.gold : "transparent"}`, transition: "0.3s" }}>{t}</button>
-          ))}
-       </div>
+        <div style={{ background: T.white, display: "flex", padding: "0 10px", overflowX: "auto", borderBottom: `1px solid ${T.navy}10`, WebkitOverflowScrolling: "touch" }}>
+           {["leads", "inventory", "technical", "reports", "my_pass"].map(t => (
+             <button key={t} onClick={() => setTab(t)} style={{ flex: "0 0 auto", minWidth: 85, padding: "16px", border: "none", background: "none", color: tab === t ? T.navy : T.muted, fontWeight: 800, fontSize: 11, textTransform: "uppercase", borderBottom: `3px solid ${tab === t ? T.gold : "transparent"}`, transition: "0.3s" }}>
+               {t.replace("_", " ")}
+             </button>
+           ))}
+        </div>
 
        <main style={{ flex: 1, overflow: "auto", padding: "20px" }}>
           {tab === "leads" && (
@@ -1402,6 +1404,7 @@ const STAFF_ACCOUNTS = [
   { name: "Ludovica Coccia", user: "LudovicaLCB", pass: "Braderm1!" },
   { name: "Lorenza Ferretti", user: "LorenzaLCB", pass: "Braderm1!" },
   { name: "Cristiano Braccili", user: "CristianoLCB", pass: "Braderm1!" },
+  { name: "Giuseppe Braccili", user: "GiuseppeLCB", pass: "Braderm1!" },
 ];
 
 export default function LCBFairApp() {
