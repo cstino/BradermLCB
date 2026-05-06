@@ -1202,6 +1202,7 @@ function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAdd
                   <div style={{ fontSize: 13, color: T.muted, fontWeight: 600 }}>Detailed analytics and data exports available in the CSV export.</div>
                </div>
             </div>
+          )}
           {tab === "my_pass" && (
             <div style={{ maxWidth: 500, margin: "0 auto", animation: "fadeUp 0.5s ease" }}>
                <h2 style={{ fontSize: 24, fontFamily: SERIF, marginBottom: 25, color: T.navy }}>My Travel Documents</h2>
