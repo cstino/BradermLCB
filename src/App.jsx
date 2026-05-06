@@ -972,7 +972,7 @@ function RequestSection({ onBack, onLead }) {
   return <LeadForm onBack={onBack} title={L.title} sub={L.sub} submitLabel={L.submit} hideBrochures onSubmit={d => { onLead({...d, type: "general", date: new Date().toISOString()}); setDone(d); }} />;
 }
 
-function StaffDashboard({ leads, brochures, onToggleBrochure, onAddLead, onUpdateLead, onDeleteLead, onClose }) {
+function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAddLead, onUpdateLead, onDeleteLead, onClose }) {
   const [tab, setTab] = useState("leads");
   const [showAdd, setShowAdd] = useState(false);
   const [editItem, setEditItem] = useState(null);
@@ -1010,7 +1010,7 @@ function StaffDashboard({ leads, brochures, onToggleBrochure, onAddLead, onUpdat
        </header>
 
        <div style={{ background: T.white, display: "flex", padding: "0 10px" }}>
-          {["leads", "inventory", "technical", "reports"].map(t => (
+          {["leads", "inventory", "technical", "reports", "my_pass"].map(t => (
             <button key={t} onClick={() => setTab(t)} style={{ flex: 1, padding: "16px", border: "none", background: "none", color: tab === t ? T.navy : T.muted, fontWeight: 800, fontSize: 12, textTransform: "uppercase", borderBottom: `3px solid ${tab === t ? T.gold : "transparent"}`, transition: "0.3s" }}>{t}</button>
           ))}
        </div>
@@ -1186,8 +1186,68 @@ function StaffDashboard({ leads, brochures, onToggleBrochure, onAddLead, onUpdat
                   <div style={{ fontSize: 13, color: T.muted, fontWeight: 600 }}>Detailed analytics and data exports available in the CSV export.</div>
                </div>
             </div>
+          {tab === "my_pass" && (
+            <div style={{ maxWidth: 500, margin: "0 auto", animation: "fadeUp 0.5s ease" }}>
+               <h2 style={{ fontSize: 24, fontFamily: SERIF, marginBottom: 25, color: T.navy }}>My Travel Documents</h2>
+               
+               {(() => {
+                  const firstName = (currentUser || "").split(" ")[0];
+                  const folder = (currentUser || "").replace(/\s+/g, "_");
+                  const badge = `/addetti/${folder}/badge/badge ${firstName.toLowerCase()}.pdf`;
+                  const flight = `/addetti/${folder}/biglietti_aereo/BP_${firstName}.pdf`;
+                  
+                  return (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                       {/* Badge Card */}
+                       <div style={{ background: T.white, borderRadius: 24, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.05)", border: `1px solid ${T.navy}05` }}>
+                          <div style={{ background: T.gold, padding: "15px 25px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                             <div style={{ color: T.navy, fontWeight: 900, fontSize: 12, letterSpacing: 2, textTransform: "uppercase" }}>Entry Badge</div>
+                             <Icon name="sparkle" size={18} color={T.navy} />
+                          </div>
+                          <div style={{ padding: 25, display: "flex", alignItems: "center", gap: 20 }}>
+                             <div style={{ width: 60, height: 60, borderRadius: 16, background: T.navy + "05", display: "flex", alignItems: "center", justifyContent: "center", color: T.navy, fontSize: 20, fontWeight: 800 }}>
+                                {getInitials(currentUser)}
+                             </div>
+                             <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 18, fontWeight: 800, color: T.navy, marginBottom: 4 }}>{currentUser}</div>
+                                <div style={{ fontSize: 11, color: T.muted, fontWeight: 600, textTransform: "uppercase" }}>Braderm Fair Team</div>
+                             </div>
+                          </div>
+                          <div style={{ padding: "0 25px 25px" }}>
+                             <Btn onClick={() => window.open(badge, "_blank")} variant="primary" full icon="🎟">VIEW ENTRY BADGE</Btn>
+                          </div>
+                       </div>
+
+                       {/* Boarding Pass Card */}
+                       <div style={{ background: T.white, borderRadius: 24, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.05)", border: `1px solid ${T.navy}05` }}>
+                          <div style={{ background: T.navy, padding: "15px 25px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                             <div style={{ color: T.white, fontWeight: 900, fontSize: 12, letterSpacing: 2, textTransform: "uppercase" }}>Boarding Pass</div>
+                             <Icon name="globe" size={18} color={T.gold} />
+                          </div>
+                          <div style={{ padding: 25 }}>
+                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                                <div>
+                                   <div style={{ fontSize: 10, fontWeight: 800, color: T.muted, textTransform: "uppercase", marginBottom: 2 }}>Passenger</div>
+                                   <div style={{ fontSize: 16, fontWeight: 800, color: T.navy }}>{currentUser}</div>
+                                </div>
+                                <div style={{ textAlign: "right" }}>
+                                   <div style={{ fontSize: 10, fontWeight: 800, color: T.muted, textTransform: "uppercase", marginBottom: 2 }}>Destination</div>
+                                   <div style={{ fontSize: 16, fontWeight: 800, color: T.navy }}>Trade Fair</div>
+                                </div>
+                             </div>
+                             <Btn onClick={() => window.open(flight, "_blank")} variant="outline" full icon="✈">OPEN FLIGHT TICKET</Btn>
+                          </div>
+                       </div>
+
+                       <div style={{ padding: 20, background: T.gold + "08", borderRadius: 20, border: `1px dashed ${T.gold}`, textAlign: "center" }}>
+                          <p style={{ margin: 0, fontSize: 12, color: T.muted, fontWeight: 600 }}>Please ensure you have these documents saved or printed for the trip.</p>
+                       </div>
+                    </div>
+                  );
+               })()}
+            </div>
           )}
-       </main>
+        </main>
 
        {tab === "leads" && (
          <button onClick={() => setShowAdd(true)} style={{ position: "fixed", bottom: 25, right: 25, width: 60, height: 60, borderRadius: "50%", background: T.navy, color: T.white, border: "none", fontSize: 24, boxShadow: "0 8px 25px rgba(11,29,50,0.3)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 6000 }}>+</button>
@@ -1524,7 +1584,7 @@ export default function LCBFairApp() {
         </div>
       );
     }
-    return <StaffDashboard leads={leads} brochures={brochures} onToggleBrochure={toggleBrochure} onAddLead={d => addLead({...d, added_by: currentUser})} onUpdateLead={updateLead} onDeleteLead={deleteLead} onClose={logout} />;
+    return <StaffDashboard currentUser={currentUser} leads={leads} brochures={brochures} onToggleBrochure={toggleBrochure} onAddLead={d => addLead({...d, added_by: currentUser})} onUpdateLead={updateLead} onDeleteLead={deleteLead} onClose={logout} />;
   }
 
   // --- VISITOR VIEW ---
