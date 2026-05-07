@@ -1463,6 +1463,21 @@ export default function LCBFairApp() {
   useEffect(() => {
     fetchLeads();
     fetchInventory();
+
+    // --- REALTIME SUBSCRIPTION ---
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on('postgres_changes', { event: '*', table: 'leads' }, () => {
+        fetchLeads();
+      })
+      .on('postgres_changes', { event: '*', table: 'inventory' }, () => {
+        fetchInventory();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchLeads = async () => {
