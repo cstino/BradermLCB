@@ -1408,7 +1408,14 @@ function ReportsDashboard({ leads, brochures, onExport }) {
     "Czech Republic": "cz", "Finland": "fi", "Sweden": "se", "Norway": "no", "Denmark": "dk",
     "Vietnam": "vn", "Sudan": "sd", "Oman": "om", "Uzbekistan": "uz", "Qatar": "qa",
     "Bahrain": "bh", "Libya": "ly", "Syria": "sy", "Yemen": "ye", "Nigeria": "ng",
-    "South Africa": "za", "Mexico": "mx", "Colombia": "co", "Russia": "ru", "Azerbaijan": "az"
+    "South Africa": "za", "Mexico": "mx", "Colombia": "co", "Russia": "ru", "Azerbaijan": "az",
+    "Bangladesh": "bd", "Chile": "cl", "San Marino": "sm", "Monaco": "mc", "Andorra": "ad",
+    "Luxembourg": "lu", "Malta": "mt", "Cyprus": "cy", "Iceland": "is", "Georgia": "ge",
+    "Armenia": "am", "Kazakhstan": "kz", "Kyrgyzstan": "kg", "Tajikistan": "tj", "Turkmenistan": "tm",
+    "Israel": "il", "Iran": "ir", "Pakistan": "pk", "Sri Lanka": "lk", "Nepal": "np",
+    "Thailand": "th", "Indonesia": "id", "Malaysia": "my", "Philippines": "ph", "Singapore": "sg",
+    "Australia": "au", "New Zealand": "nz", "Peru": "pe", "Venezuela": "ve", "Ecuador": "ec",
+    "Bolivia": "bo", "Paraguay": "py", "Uruguay": "uy"
   };
   
   // 1. KPI Data
