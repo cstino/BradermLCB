@@ -6,4 +6,7 @@ export default defineConfig({
   server: {
     host: true,
   },
+  optimizeDeps: {
+    include: ['react-simple-maps', 'prop-types', 'd3-scale', 'd3-geo', 'topojson-client']
+  }
 })

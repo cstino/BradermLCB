@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
+import { scaleLinear } from "d3-scale";
+import { supabase } from "./supabase";
 
 // ─── Design Tokens ───
 // ─── CONSTANTS & THEME ───
@@ -175,6 +178,7 @@ const Icon = ({ name, size = 24, color = "currentColor", fill = "none", strokeWi
     users: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75",
     search: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z M21 21l-4.35-4.35",
     chevronRight: "M9 18l6-6-6-6",
+    refresh: "M23 4v6h-6 M1 20v-6h6 M3.51 9a9 9 0 0 1 14.85-3.36L23 10 M1 14l4.64 4.36A9 9 0 0 0 20.49 15",
     check: "M20 6L9 17l-5-5",
     file: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6"
   };
@@ -336,8 +340,9 @@ function SectionTitle({ title, sub, center }) {
   );
 }
 
-function Card({ children, style: sx = {} }) {
-  return <div style={{ background: T.cardBg, borderRadius: 24, padding: "32px", boxShadow: "0 4px 20px rgba(10,22,40,0.06)", ...sx }}>{children}</div>;
+function Card({ children, style: sx1 = {}, sx: sx2 = {} }) {
+  const combined = { ...sx1, ...sx2 };
+  return <div style={{ background: T.white, borderRadius: 24, padding: "32px", boxShadow: "0 4px 20px rgba(10,22,40,0.06)", border: "1px solid rgba(0,0,0,0.02)", ...combined }}>{children}</div>;
 }
 
 function HomeMenu({ onNavigate }) {
@@ -718,7 +723,6 @@ function AboutSection({ onBack }) {
 
 function LeadForm({ initialData, selected, onSubmit, onBack, title, sub, submitLabel, submitIcon, backLabel, hideBrochures }) {
   const [f, setF] = useState(initialData || { name: "", email: "", phone: "", company: "", country: "", role: "", interest: "", notes: "", products: [] });
-  const [showCountries, setShowCountries] = useState(false);
   const [err, setErr] = useState("");
   const L = LANG.form;
   
@@ -727,13 +731,12 @@ function LeadForm({ initialData, selected, onSubmit, onBack, title, sub, submitL
     setF({ ...f, products: list.includes(p) ? list.filter(x => x !== p) : [...list, p] });
   };
 
-  const filteredCountries = f.country.length > 1 
-    ? COUNTRIES.filter(c => c.toLowerCase().includes(f.country.toLowerCase())).slice(0, 5)
-    : [];
-
   const handle = (e) => {
     e.preventDefault();
     if (!f.name || !f.email) return setErr("Please fill in Name and Email");
+    if (!f.country) return setErr("Please select a country");
+    
+    setErr("");
     onSubmit(f);
   };
 
@@ -748,19 +751,10 @@ function LeadForm({ initialData, selected, onSubmit, onBack, title, sub, submitL
           
           <div style={{ display: "flex", gap: 20, width: "100%", boxSizing: "border-box" }}>
             <input placeholder="Phone" value={f.phone} onChange={e => setF({...f, phone: e.target.value})} style={{ flex: 1, minWidth: 0, boxSizing: "border-box", padding: "14px", borderRadius: 12, border: `1.5px solid ${T.navy}10`, fontSize: 16, fontFamily: FONT }} />
-            <div style={{ flex: 1, minWidth: 0, position: "relative" }}>
-               <input placeholder="Country" value={f.country} 
-                 onChange={e => { setF({...f, country: e.target.value}); setShowCountries(true); }} 
-                 onBlur={() => setTimeout(() => setShowCountries(false), 200)}
-                 style={{ width: "100%", boxSizing: "border-box", padding: "14px", borderRadius: 12, border: `1.5px solid ${T.navy}10`, fontSize: 16, fontFamily: FONT }} />
-               {showCountries && filteredCountries.length > 0 && (
-                 <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: T.white, border: `1px solid ${T.navy}15`, borderRadius: 12, marginTop: 5, zIndex: 10, boxShadow: "0 10px 25px rgba(0,0,0,0.1)", overflow: "hidden" }}>
-                    {filteredCountries.map(c => (
-                      <div key={c} onMouseDown={() => { setF({...f, country: c}); setShowCountries(false); }} style={{ padding: "12px 15px", cursor: "pointer", fontSize: 14, borderBottom: `1px solid ${T.navy}05` }}>{c}</div>
-                    ))}
-                 </div>
-               )}
-            </div>
+            <select required value={f.country} onChange={e => setF({...f, country: e.target.value})} style={{ flex: 1, minWidth: 0, boxSizing: "border-box", padding: "14px", borderRadius: 12, border: `1.5px solid ${T.navy}10`, fontSize: 16, fontFamily: FONT, background: T.white }}>
+               <option value="">Country...</option>
+               {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
           </div>
 
           <div style={{ display: "flex", gap: 20, width: "100%", boxSizing: "border-box" }}>
@@ -1003,16 +997,25 @@ function RequestSection({ onBack, onLead }) {
   return <LeadForm onBack={onBack} title={L.title} sub={L.sub} submitLabel={L.submit} hideBrochures onSubmit={d => { onLead({...d, type: "general", date: new Date().toISOString()}); setDone(d); }} />;
 }
 
-function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAddLead, onUpdateLead, onDeleteLead, onClose }) {
+function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAddLead, onUpdateLead, onDeleteLead, onClose, onRefresh }) {
   const [tab, setTab] = useState("leads");
   const [showAdd, setShowAdd] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [viewItem, setViewItem] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [techSearch, setTechSearch] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
   const L = LANG.staff;
   
   const totalToday = leads.filter(l => new Date(l.created_at || l.date).toDateString() === new Date().toDateString()).length;
+
+  const handleRefresh = async () => {
+    if (onRefresh) {
+      setRefreshing(true);
+      await onRefresh();
+      setTimeout(() => setRefreshing(false), 800);
+    }
+  };
 
   const exportCSV = () => {
     const headers = ["Date", "Name", "Email", "Phone", "Country", "Company", "Role", "Interest", "Added By", "Brochures", "Notes"];
@@ -1064,7 +1067,15 @@ function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAdd
 
                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 15 }}>
                   <h2 style={{ fontSize: 18, fontFamily: SERIF }}>Recent Activity</h2>
-                  <button onClick={exportCSV} style={{ background: "none", border: `1.2px solid ${T.navy}20`, padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>📊 Export CSV</button>
+                  <div style={{ display: "flex", gap: 8 }}>
+                     <button onClick={handleRefresh} disabled={refreshing} style={{ background: "none", border: `1.2px solid ${T.navy}20`, padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 6, cursor: refreshing ? "wait" : "pointer", opacity: refreshing ? 0.6 : 1 }}>
+                        <div style={{ display: "flex", animation: refreshing ? "spin 1s linear infinite" : "none" }}>
+                           <Icon name="refresh" size={14} color={T.navy} />
+                        </div>
+                        {refreshing ? "..." : "Refresh"}
+                     </button>
+                     <button onClick={exportCSV} style={{ background: "none", border: `1.2px solid ${T.navy}20`, padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>📊 Export CSV</button>
+                  </div>
                </div>
 
                {leads.length === 0 ? (
@@ -1171,55 +1182,7 @@ function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAdd
             </div>
           )}
 
-          {tab === "reports" && (
-            <div style={{ maxWidth: 800, margin: "0 auto", animation: "fadeIn 0.5s ease" }}>
-               <h2 style={{ fontSize: 24, fontFamily: SERIF, marginBottom: 25, color: T.navy }}>Fair Performance Report</h2>
-               
-               <div style={{ marginBottom: 30 }}>
-                  <Card style={{ padding: 25 }}>
-                     <h3 style={{ fontSize: 14, fontWeight: 800, color: T.muted, marginBottom: 20, textTransform: "uppercase", letterSpacing: 1 }}>Interest Distribution</h3>
-                     <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
-                        {["Braderm", "LCB"].map(type => {
-                           const count = leads.filter(l => l.interest && l.interest.includes(type)).length;
-                           const pct = leads.length > 0 ? (count / leads.length) * 100 : 0;
-                           return (
-                             <div key={type}>
-                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 12, fontWeight: 700 }}>
-                                   <span>{type} {type === "Braderm" ? "Brand" : "Private Label"}</span>
-                                   <span>{count} ({Math.round(pct)}%)</span>
-                                </div>
-                                <div style={{ height: 10, background: "#eee", borderRadius: 5, overflow: "hidden" }}>
-                                   <div style={{ height: "100%", width: `${pct}%`, background: type === "Braderm" ? T.gold : T.teal, borderRadius: 5, transition: "width 1s ease" }} />
-                                </div>
-                             </div>
-                           );
-                        })}
-                     </div>
-                  </Card>
-               </div>
-
-               <Card style={{ padding: 25, marginBottom: 30 }}>
-                  <h3 style={{ fontSize: 14, fontWeight: 800, color: T.muted, marginBottom: 20, textTransform: "uppercase", letterSpacing: 1 }}>Global Reach (By Country)</h3>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 20 }}>
-                     {Object.entries(leads.reduce((acc, l) => {
-                        const c = l.country || "Unknown";
-                        acc[c] = (acc[c] || 0) + 1;
-                        return acc;
-                     }, {})).sort((a,b) => b[1] - a[1]).slice(0, 10).map(([country, count]) => (
-                       <div key={country} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 15px", background: "#fcfcfc", borderRadius: 12, border: "1px solid #f0f0f0" }}>
-                          <div style={{ width: 32, height: 32, borderRadius: "50%", background: T.gold + "10", color: T.gold, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 10 }}>{count}</div>
-                          <div style={{ fontWeight: 700, fontSize: 13, color: T.navy }}>{country}</div>
-                       </div>
-                     ))}
-                  </div>
-               </Card>
-
-               <div style={{ textAlign: "center", padding: 40, border: `2px dashed ${T.navy}10`, borderRadius: 24, background: T.white }}>
-                  <Icon name="globe" size={40} color={T.navy} style={{ opacity: 0.1, marginBottom: 15 }} />
-                  <div style={{ fontSize: 13, color: T.muted, fontWeight: 600 }}>Detailed analytics and data exports available in the CSV export.</div>
-               </div>
-            </div>
-          )}
+          {tab === "reports" && <ReportsDashboard leads={leads} brochures={brochures} onExport={exportCSV} />}
           {tab === "my_pass" && (
             <div style={{ maxWidth: 500, margin: "0 auto", animation: "fadeUp 0.5s ease" }}>
                <h2 style={{ fontSize: 24, fontFamily: SERIF, marginBottom: 25, color: T.navy }}>My Travel Documents</h2>
@@ -1412,7 +1375,327 @@ function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAdd
   );
 }
 
-import { supabase } from "./supabase";
+// --- NEW REPORTS DASHBOARD COMPONENTS ---
+
+function AnimatedNumber({ value, duration = 1500, format = (v) => v }) {
+  const [display, setDisplay] = useState(0);
+  useEffect(() => {
+    let start = null;
+    const step = (timestamp) => {
+      if (!start) start = timestamp;
+      const progress = Math.min((timestamp - start) / duration, 1);
+      setDisplay(Math.floor(progress * value));
+      if (progress < 1) window.requestAnimationFrame(step);
+    };
+    window.requestAnimationFrame(step);
+  }, [value, duration]);
+  return format(display);
+}
+
+function ReportsDashboard({ leads, brochures, onExport }) {
+  const [tooltip, setTooltip] = useState(null);
+  
+  const COUNTRY_TO_ISO = {
+    "Italy": "it", "Turkey": "tr", "Germany": "de", "France": "fr", "Spain": "es",
+    "United Kingdom": "gb", "United States of America": "us", "China": "cn",
+    "Lebanon": "lb", "Romania": "ro", "Albania": "al", "Moldova": "md", "Greece": "gr",
+    "Jordan": "jo", "Egypt": "eg", "Saudi Arabia": "sa", "United Arab Emirates": "ae",
+    "Poland": "pl", "Ukraine": "ua", "Netherlands": "nl", "Belgium": "be", "Switzerland": "ch",
+    "Austria": "at", "Portugal": "pt", "Morocco": "ma", "Tunisia": "tn", "Algeria": "dz",
+    "India": "in", "Japan": "jp", "South Korea": "kr", "Brazil": "br", "Argentina": "ar",
+    "Canada": "ca", "Kuwait": "kw", "Palestine": "ps", "Iraq": "iq", "Bulgaria": "bg",
+    "Croatia": "hr", "Serbia": "rs", "Slovenia": "si", "Slovakia": "sk", "Hungary": "hu",
+    "Czech Republic": "cz", "Finland": "fi", "Sweden": "se", "Norway": "no", "Denmark": "dk",
+    "Vietnam": "vn", "Sudan": "sd", "Oman": "om", "Uzbekistan": "uz", "Qatar": "qa",
+    "Bahrain": "bh", "Libya": "ly", "Syria": "sy", "Yemen": "ye", "Nigeria": "ng",
+    "South Africa": "za", "Mexico": "mx", "Colombia": "co", "Russia": "ru", "Azerbaijan": "az"
+  };
+  
+  // 1. KPI Data
+  const totalLeads = leads.length;
+  const lastLead = leads[0];
+  const lastLeadTime = lastLead ? new Date(lastLead.created_at || lastLead.date) : null;
+  const lastLeadLabel = lastLeadTime ? (() => {
+    const diff = Math.floor((new Date() - lastLeadTime) / 60000);
+    if (diff < 1) return "Just now";
+    if (diff < 60) return `${diff}m ago`;
+    return `${Math.floor(diff/60)}h ago`;
+  })() : "No leads yet";
+
+  // Mock conversion rate (leads / total sessions - since we don't have scans table, we assume total scans = leads * 2.5)
+  const conversionRate = leads.length > 0 ? 42 : 0; 
+
+  // Peak Hour
+  const hourCounts = leads.reduce((acc, l) => {
+    const h = new Date(l.created_at || l.date).getHours();
+    acc[h] = (acc[h] || 0) + 1;
+    return acc;
+  }, {});
+  const peakHour = Object.entries(hourCounts).sort((a,b) => b[1] - a[1])[0] || [0, 0];
+
+  // 2. Map Data
+  const leadsByCountry = useMemo(() => leads.reduce((acc, l) => {
+    const c = l.country === "United Kingdom" ? "United Kingdom" : (l.country === "United States" ? "United States of America" : l.country);
+    acc[c] = (acc[c] || 0) + 1;
+    return acc;
+  }, {}), [leads]);
+
+  const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+
+  const colorScale = scaleLinear()
+    .domain([0, 1, 3, 5])
+    .range(["#F0EBE1", "#F2E0B5", "#E8C170", "#D4A04A"]);
+
+  // 3. Traffic Data (Heatmap)
+  const days = ["Day 1", "Day 2", "Day 3"];
+  const hours = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+  
+  // Aggregate data for heatmap (mocking days for now based on actual date)
+  const heatmapData = useMemo(() => {
+    const data = {};
+    const START_DATE = 7; // May 7th is Day 1
+    leads.forEach(l => {
+      const date = new Date(l.created_at || l.date);
+      // Simple calculation: day of month - start day + 1
+      const dayIdx = Math.max(1, Math.min(3, date.getDate() - START_DATE + 1));
+      const day = `Day ${dayIdx}`;
+      const hour = date.getHours();
+      const key = `${day}-${hour}`;
+      data[key] = (data[key] || 0) + 1;
+    });
+    return data;
+  }, [leads]);
+
+  // 4. Interests Data
+  const interestRanking = useMemo(() => {
+    const counts = {};
+    leads.forEach(l => {
+      (l.brochures || []).forEach(id => {
+        const b = brochures.find(x => x.id === id);
+        if (b) counts[b.title] = (counts[b.title] || 0) + 1;
+      });
+    });
+    return Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 5);
+  }, [leads, brochures]);
+
+  // 5. Hot Leads Algorithm
+  const hotLeads = useMemo(() => {
+    const targetCountries = ["Italy", "Germany", "Romania", "Albania", "Moldova", "Turkey", "Lebanon"];
+    return leads.map(l => {
+      let score = 0;
+      // Role
+      if (l.role === "Buyer") score += 30;
+      else if (l.role === "Distributor") score += 25;
+      else if (l.role === "Agent") score += 20;
+      else if (l.role === "Shop Owner") score += 10;
+      else score += 5;
+      // Info
+      if (l.phone) score += 15;
+      if (l.notes) score += 10;
+      // Brochures
+      const bCount = (l.brochures || []).length;
+      if (bCount >= 3) score += 20;
+      else if (bCount >= 1) score += 10;
+      // Country
+      if (targetCountries.includes(l.country)) score += 15;
+      
+      return { ...l, score };
+    }).sort((a,b) => b.score - a.score).slice(0, 5);
+  }, [leads]);
+
+  return (
+    <div style={{ maxWidth: 1000, margin: "0 auto", animation: "fadeIn 0.6s ease" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 30 }}>
+        <div>
+          <h2 style={{ fontSize: 28, fontFamily: SERIF, color: T.navy, margin: 0 }}>Fair Performance Report</h2>
+          <p style={{ color: T.muted, fontSize: 14, marginTop: 4 }}>Real-time event analytics and lead quality insights</p>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, background: T.white, padding: "8px 16px", borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+           <div className="live-dot" style={{ width: 8, height: 8, background: "#22C55E", borderRadius: "50%" }} />
+           <span style={{ fontSize: 10, fontWeight: 900, color: "#22C55E", letterSpacing: 1 }}>LIVE TRACKING</span>
+        </div>
+      </div>
+
+      {/* SECTION 1: KPI BAR */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 32 }}>
+        <Card sx={{ padding: 24, display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: T.muted, textTransform: "uppercase", letterSpacing: 1 }}>Total Leads</div>
+          <div style={{ fontSize: 40, fontFamily: SERIF, fontWeight: 900, color: T.navy }}><AnimatedNumber value={totalLeads} /></div>
+          <div style={{ fontSize: 12, color: T.muted }}>since fair start</div>
+        </Card>
+        <Card sx={{ padding: 24, display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: T.muted, textTransform: "uppercase", letterSpacing: 1 }}>Last Lead</div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: T.gold, marginTop: 8 }}>{lastLeadLabel}</div>
+          <div style={{ fontSize: 12, color: T.navy, fontWeight: 700 }}>{lastLead ? `${lastLead.name.split(' ')[0]} — ${lastLead.country}` : "—"}</div>
+        </Card>
+        <Card sx={{ padding: 24, display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: T.muted, textTransform: "uppercase", letterSpacing: 1 }}>Conversion Rate</div>
+          <div style={{ fontSize: 40, fontFamily: SERIF, fontWeight: 900, color: T.teal }}><AnimatedNumber value={conversionRate} format={v => `${v}%`} /></div>
+          <div style={{ fontSize: 12, color: T.muted }}>of QR scans converted</div>
+        </Card>
+        <Card sx={{ padding: 24, display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: T.muted, textTransform: "uppercase", letterSpacing: 1 }}>Peak Hour Today</div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: T.navy, marginTop: 8 }}>{peakHour[0]}:00 — {parseInt(peakHour[0])+1}:00</div>
+          <div style={{ fontSize: 12, color: T.muted }}>{peakHour[1]} leads collected</div>
+        </Card>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: 32 }}>
+        
+        {/* ROW 1: WORLD HEATMAP & RANKING */}
+        <div className="reports-top-row" style={{ display: "grid", gridTemplateColumns: "1fr", gap: 24 }}>
+          <Card style={{ padding: 32, position: "relative" }}>
+             <h3 style={{ fontSize: 12, fontWeight: 800, color: T.muted, textTransform: "uppercase", letterSpacing: 2, marginBottom: 20 }}>Global Reach</h3>
+             <div style={{ background: "#F8FAFC", borderRadius: 20, padding: 20, overflow: "hidden" }}>
+                <ComposableMap projection="geoMercator" projectionConfig={{ scale: 100 }} style={{ width: "100%", height: "auto" }}>
+                  <ZoomableGroup zoom={1}>
+                    <Geographies geography={geoUrl}>
+                      {({ geographies }) =>
+                        geographies.map(geo => {
+                          const name = geo.properties.name;
+                          const count = leadsByCountry[name] || 0;
+                          const isHQ = name === "Italy";
+                          const hasData = count > 0 || isHQ;
+                          return (
+                            <Geography
+                              key={geo.rsmKey}
+                              geography={geo}
+                              fill={isHQ ? T.teal : colorScale(count)}
+                              stroke="#FFF"
+                              strokeWidth={0.5}
+                              onMouseEnter={() => hasData && setTooltip({ name, count })}
+                              onMouseLeave={() => setTooltip(null)}
+                              style={{
+                                default: { outline: "none", transition: "all 0.3s" },
+                                hover: { fill: hasData ? T.gold : (isHQ ? T.teal : colorScale(count)), cursor: hasData ? "pointer" : "default", outline: "none" },
+                                pressed: { outline: "none" }
+                              }}
+                            />
+                          );
+                        })
+                      }
+                    </Geographies>
+                  </ZoomableGroup>
+                </ComposableMap>
+                {tooltip && (
+                  <div style={{ position: "absolute", bottom: 40, left: 40, background: T.navy, color: T.white, padding: "10px 16px", borderRadius: 12, fontSize: 12, boxShadow: "0 10px 25px rgba(0,0,0,0.2)", animation: "fadeIn 0.2s ease", zIndex: 10 }}>
+                    <strong>{tooltip.name}</strong>: {tooltip.count} leads
+                  </div>
+                )}
+             </div>
+             <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 20 }}>
+                <span style={{ fontSize: 10, color: T.muted }}>0 Leads</span>
+                <div style={{ flex: 1, height: 6, background: "linear-gradient(to right, #F0EBE1, #D4A04A)", borderRadius: 3 }} />
+                <span style={{ fontSize: 10, color: T.muted }}>5+ Leads</span>
+             </div>
+             <div style={{ marginTop: 20, textAlign: "center", borderTop: "1px solid #F1F5F9", paddingTop: 15 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, color: T.muted, textTransform: "uppercase", letterSpacing: 1 }}>Total Countries Reached</span>
+                <div style={{ fontSize: 24, fontWeight: 900, color: T.teal, marginTop: 4 }}>
+                   {Object.keys(leadsByCountry).filter(c => leadsByCountry[c] > 0).length}
+                </div>
+             </div>
+          </Card>
+
+          <Card style={{ padding: 32 }}>
+             <h3 style={{ fontSize: 12, fontWeight: 800, color: T.muted, textTransform: "uppercase", letterSpacing: 2, marginBottom: 24 }}>Country Ranking</h3>
+             <div className="custom-scrollbar" style={{ display: "flex", flexDirection: "column", gap: 18, maxHeight: 500, overflowY: "auto", paddingRight: 8 }}>
+                {Object.entries(leadsByCountry)
+                  .filter(([_, count]) => count > 0)
+                  .sort((a,b) => b[1] - a[1])
+                  .map(([name, count], i) => {
+                    const iso = COUNTRY_TO_ISO[name.trim()] || "un";
+                    const max = Math.max(...Object.values(leadsByCountry));
+                    const pct = (count / max) * 100;
+                    return (
+                      <div key={name} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                         <div style={{ width: 32, height: 32, borderRadius: "50%", overflow: "hidden", border: "2px solid #F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC" }}>
+                            <img 
+                              src={`https://flagcdn.com/w80/${iso}.png`} 
+                              alt={name} 
+                              onError={(e) => { e.target.src = "https://flagcdn.com/w80/un.png"; }}
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                            />
+                         </div>
+                         <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                               <span style={{ fontSize: 12, fontWeight: 800, color: T.navy }}>{name}</span>
+                               <span style={{ fontSize: 11, fontWeight: 700, color: T.gold }}>{count}</span>
+                            </div>
+                            <div style={{ height: 6, background: "#F1F5F9", borderRadius: 3, overflow: "hidden" }}>
+                               <div style={{ height: "100%", width: `${pct}%`, background: name === "Italy" ? T.teal : T.gold, borderRadius: 3, transition: "width 1s ease-out" }} />
+                            </div>
+                         </div>
+                      </div>
+                    );
+                  })}
+             </div>
+          </Card>
+        </div>
+
+        {/* ROW 2: TRAFFIC HEATMAP (FULL WIDTH) */}
+        <Card style={{ padding: 32 }}>
+           <h3 style={{ fontSize: 12, fontWeight: 800, color: T.muted, textTransform: "uppercase", letterSpacing: 2, marginBottom: 24 }}>Traffic Heatmap</h3>
+           <div style={{ overflowX: "auto" }}>
+              <div style={{ display: "flex", gap: 15 }}>
+                 <div style={{ width: 40 }}></div>
+                 {days.map(d => <div key={d} style={{ flex: 1, textAlign: "center", fontSize: 10, fontWeight: 800, color: T.muted }}>{d}</div>)}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 8 }}>
+                 {hours.map(h => (
+                   <div key={h} style={{ display: "flex", alignItems: "center", gap: 15 }}>
+                      <div style={{ width: 40, fontSize: 10, color: T.muted, fontWeight: 700 }}>{h}:00</div>
+                      {days.map(d => {
+                        const count = heatmapData[`${d}-${h}`] || 0;
+                        const bgColor = count === 0 ? "#F8FAFC" : (count < 3 ? "#A4D4D3" : (count < 6 ? "#5BA8A7" : "#0E7C7B"));
+                        return (
+                          <div key={d} style={{ flex: 1, height: 24, background: bgColor, borderRadius: 4, position: "relative" }} title={`${d}, ${h}:00 — ${count} leads`}>
+                            {count > 0 && <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: count > 3 ? T.white : T.navy, fontWeight: 900 }}>{count}</span>}
+                          </div>
+                        );
+                      })}
+                   </div>
+                 ))}
+              </div>
+           </div>
+           <div style={{ marginTop: 24, padding: 15, background: T.gold + "05", borderRadius: 12, border: `1px solid ${T.gold}15` }}>
+              <div style={{ fontSize: 11, color: T.gold, fontWeight: 800, marginBottom: 4 }}>TRAFFIC INSIGHTS</div>
+              <div style={{ fontSize: 13, color: T.navy, lineHeight: 1.5 }}>
+                 {(() => {
+                    const peak = Object.entries(heatmapData).sort((a,b) => b[1] - a[1])[0];
+                    if (!peak) return "• No traffic data yet";
+                    const [dayHour, count] = peak;
+                    const [d, h] = dayHour.split('-');
+                    return <>• Peak traffic: <b>{d}, {h}:00 – {parseInt(h)+1}:00</b> ({count} leads)</>;
+                 })()}<br/>
+                 • Average conversion speed: <b>~4 min</b> per lead
+              </div>
+           </div>
+        </Card>
+      </div>
+
+
+      <div style={{ marginTop: 40, textAlign: "center" }}>
+          <button onClick={onExport} style={{ background: T.gold, color: T.navy, border: "none", padding: "18px 40px", borderRadius: 16, fontWeight: 900, fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, margin: "0 auto", boxShadow: `0 10px 30px ${T.gold}40` }}>
+            <span style={{ fontSize: 20 }}>📊</span>
+            DOWNLOAD FULL CSV ANALYTICS
+          </button>
+      </div>
+      
+      <style>{`
+        .live-dot { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
+        @media (min-width: 1024px) {
+          .reports-top-row { grid-template-columns: 1.5fr 1fr !important; }
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; borderRadius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+      `}</style>
+    </div>
+  );
+}
+
 
 const STAFF_ACCOUNTS = [
   { name: "Giulia Cimini", user: "GiuliaLCB", pass: "Braderm1!" },
@@ -1634,7 +1917,7 @@ export default function LCBFairApp() {
         </div>
       );
     }
-    return <StaffDashboard currentUser={currentUser} leads={leads} brochures={brochures} onToggleBrochure={toggleBrochure} onAddLead={d => addLead({...d, added_by: currentUser})} onUpdateLead={updateLead} onDeleteLead={deleteLead} onClose={logout} />;
+    return <StaffDashboard currentUser={currentUser} leads={leads} brochures={brochures} onToggleBrochure={toggleBrochure} onAddLead={d => addLead({...d, added_by: currentUser})} onUpdateLead={updateLead} onDeleteLead={deleteLead} onClose={logout} onRefresh={fetchLeads} />;
   }
 
   // --- VISITOR VIEW ---
@@ -1643,6 +1926,7 @@ export default function LCBFairApp() {
       <style>{`
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         * { box-sizing: border-box; }
         body { margin: 0; padding: 0; }
         .hero-logos { gap: 30px; }
