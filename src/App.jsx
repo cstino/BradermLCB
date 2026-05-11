@@ -1018,10 +1018,11 @@ function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAdd
   };
 
   const exportCSV = () => {
-    const headers = ["Date", "Name", "Email", "Phone", "Country", "Company", "Role", "Interest", "Added By", "Brochures", "Notes"];
+    const headers = ["Contacted", "Date", "Name", "Email", "Phone", "Country", "Company", "Role", "Interest", "Added By", "Brochures", "Notes"];
     const rows = leads.map(l => {
       const bNames = (l.brochures || []).map(id => brochures.find(x => x.id === id)?.title || id).join(" | ");
       const data = [
+        l.contacted ? "YES" : "NO",
         new Date(l.created_at || l.date).toLocaleString().replace(",", ""), 
         l.name, l.email, l.phone, l.country, l.company, l.role, l.interest, l.added_by || "Visitor", bNames, (l.notes || "").replace(/\n/g, " ")
       ];
@@ -1182,7 +1183,7 @@ function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAdd
             </div>
           )}
 
-          {tab === "reports" && <ReportsDashboard leads={leads} brochures={brochures} onExport={exportCSV} />}
+          {tab === "reports" && <ReportsDashboard leads={leads} brochures={brochures} onExport={exportCSV} onUpdateLead={onUpdateLead} />}
           {tab === "my_pass" && (
             <div style={{ maxWidth: 500, margin: "0 auto", animation: "fadeUp 0.5s ease" }}>
                <h2 style={{ fontSize: 24, fontFamily: SERIF, marginBottom: 25, color: T.navy }}>My Travel Documents</h2>
@@ -1414,11 +1415,12 @@ const COUNTRY_TO_ISO = {
   "Bolivia": "bo", "Paraguay": "py", "Uruguay": "uy", "United States": "us"
 };
 
-function LeadsTable({ leads, brochures }) {
+function LeadsTable({ leads, brochures, onUpdateLead }) {
   const [search, setSearch] = useState("");
   const [filterCountry, setFilterCountry] = useState("");
   const [filterStaff, setFilterStaff] = useState("");
   const [filterInterest, setFilterInterest] = useState("");
+  const [hideContacted, setHideContacted] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
   const [copiedId, setCopiedId] = useState(null);
 
@@ -1440,7 +1442,8 @@ function LeadsTable({ leads, brochures }) {
         const matchesCountry = !filterCountry || l.country === filterCountry;
         const matchesStaff = !filterStaff || l.added_by === filterStaff;
         const matchesInterest = !filterInterest || l.interest === filterInterest;
-        return matchesSearch && matchesCountry && matchesStaff && matchesInterest;
+        const matchesHideContacted = !hideContacted || !l.contacted;
+        return matchesSearch && matchesCountry && matchesStaff && matchesInterest && matchesHideContacted;
       })
       .sort((a, b) => {
         let aVal = a[sortConfig.key] || "";
@@ -1453,7 +1456,7 @@ function LeadsTable({ leads, brochures }) {
         if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
       });
-  }, [leads, search, filterCountry, filterStaff, filterInterest, sortConfig]);
+  }, [leads, search, filterCountry, filterStaff, filterInterest, hideContacted, sortConfig]);
 
   const requestSort = (key) => {
     let direction = 'asc';
@@ -1498,8 +1501,19 @@ function LeadsTable({ leads, brochures }) {
             <option value="">All Interests</option>
             {interests.map(i => <option key={i} value={i}>{i.split("(")[0]}</option>)}
           </select>
-          {(search || filterCountry || filterStaff || filterInterest) && (
-            <button onClick={() => { setSearch(""); setFilterCountry(""); setFilterStaff(""); setFilterInterest(""); }} style={{ background: "none", border: "none", color: T.error, fontSize: 12, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Clear Filters</button>
+          
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", padding: "0 10px" }}>
+            <input 
+              type="checkbox" 
+              checked={hideContacted} 
+              onChange={e => setHideContacted(e.target.checked)}
+              style={{ width: 16, height: 16, accentColor: T.navy }}
+            />
+            <span style={{ fontSize: 13, fontWeight: 700, color: T.navy, whiteSpace: "nowrap" }}>Hide Contacted</span>
+          </label>
+
+          {(search || filterCountry || filterStaff || filterInterest || hideContacted) && (
+            <button onClick={() => { setSearch(""); setFilterCountry(""); setFilterStaff(""); setFilterInterest(""); setHideContacted(false); }} style={{ background: "none", border: "none", color: T.error, fontSize: 12, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Clear Filters</button>
           )}
         </div>
       </div>
@@ -1509,6 +1523,7 @@ function LeadsTable({ leads, brochures }) {
           <thead>
             <tr style={{ background: T.navy, color: T.white }}>
               {[
+                { label: "", key: "contacted", width: 40 },
                 { label: "Date", key: "date" },
                 { label: "Lead Name", key: "name" },
                 { label: "Email", key: "email" },
@@ -1520,12 +1535,14 @@ function LeadsTable({ leads, brochures }) {
                 { label: "Staff", key: "added_by" },
                 { label: "Notes", key: "notes" }
               ].map(col => (
-                <th key={col.key} onClick={() => requestSort(col.key)} style={{ padding: "15px 20px", textAlign: "left", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, cursor: "pointer", whiteSpace: "nowrap" }}>
+                <th key={col.key} onClick={() => col.key !== 'contacted' && requestSort(col.key)} style={{ padding: "15px 20px", textAlign: "left", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, cursor: col.key !== 'contacted' ? "pointer" : "default", whiteSpace: "nowrap", width: col.width }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     {col.label}
-                    <span style={{ fontSize: 10, opacity: sortConfig.key === col.key ? 1 : 0.3 }}>
-                      {sortConfig.key === col.key ? (sortConfig.direction === 'asc' ? "↑" : "↓") : "⇅"}
-                    </span>
+                    {col.key !== 'contacted' && (
+                      <span style={{ fontSize: 10, opacity: sortConfig.key === col.key ? 1 : 0.3 }}>
+                        {sortConfig.key === col.key ? (sortConfig.direction === 'asc' ? "↑" : "↓") : "⇅"}
+                      </span>
+                    )}
                   </div>
                 </th>
               ))}
@@ -1533,7 +1550,19 @@ function LeadsTable({ leads, brochures }) {
           </thead>
           <tbody>
             {filteredLeads.map((l, i) => (
-              <tr key={l.id || i} style={{ borderBottom: `1px solid ${T.navy}05`, background: i % 2 === 0 ? T.white : "#F8FAFC", transition: "background 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#F1F5F9"} onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? T.white : "#F8FAFC"}>
+              <tr key={l.id || i} style={{ 
+                borderBottom: `1px solid ${T.navy}05`, 
+                background: l.contacted ? "#ECFDF5" : (i % 2 === 0 ? T.white : "#F8FAFC"), 
+                transition: "background 0.2s" 
+              }} onMouseEnter={e => e.currentTarget.style.background = l.contacted ? "#D1FAE5" : "#F1F5F9"} onMouseLeave={e => e.currentTarget.style.background = l.contacted ? "#ECFDF5" : (i % 2 === 0 ? T.white : "#F8FAFC")}>
+                <td style={{ padding: "14px 20px", textAlign: "center" }}>
+                   <input 
+                    type="checkbox" 
+                    checked={!!l.contacted} 
+                    onChange={() => onUpdateLead(l.id, { contacted: !l.contacted })}
+                    style={{ width: 18, height: 18, cursor: "pointer", accentColor: T.success }}
+                   />
+                </td>
                 <td style={{ padding: "14px 20px", fontSize: 12, color: T.muted, whiteSpace: "nowrap" }}>{new Date(l.created_at || l.date).toLocaleDateString()}</td>
                 <td style={{ padding: "14px 20px", fontSize: 13, fontWeight: 800, color: T.navy }}>{l.name}</td>
                 <td style={{ padding: "14px 20px", fontSize: 13, color: T.teal, fontWeight: 600 }}>
@@ -1602,7 +1631,7 @@ function LeadsTable({ leads, brochures }) {
   );
 }
 
-function ReportsDashboard({ leads, brochures, onExport }) {
+function ReportsDashboard({ leads, brochures, onExport, onUpdateLead }) {
   const [tooltip, setTooltip] = useState(null);
   
   // 1. KPI Data
@@ -1869,7 +1898,7 @@ function ReportsDashboard({ leads, brochures, onExport }) {
         {/* SECTION 5: DETAILED LEADS EXPLORER (EXCEL TABLE) */}
         <div style={{ marginTop: 20 }}>
            <h3 style={{ fontSize: 12, fontWeight: 800, color: T.muted, textTransform: "uppercase", letterSpacing: 2, marginBottom: 20 }}>Detailed Leads Data</h3>
-           <LeadsTable leads={leads} brochures={brochures} />
+           <LeadsTable leads={leads} brochures={brochures} onUpdateLead={onUpdateLead} />
         </div>
       </div>
 
