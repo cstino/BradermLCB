@@ -1018,11 +1018,12 @@ function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAdd
   };
 
   const exportCSV = () => {
-    const headers = ["Contacted", "Date", "Name", "Email", "Phone", "Country", "Company", "Role", "Interest", "Added By", "Brochures", "Notes"];
+    const headers = ["Contacted", "Contacted By", "Date", "Name", "Email", "Phone", "Country", "Company", "Role", "Interest", "Added By", "Brochures", "Notes"];
     const rows = leads.map(l => {
       const bNames = (l.brochures || []).map(id => brochures.find(x => x.id === id)?.title || id).join(" | ");
       const data = [
         l.contacted ? "YES" : "NO",
+        l.contacted_by || "—",
         new Date(l.created_at || l.date).toLocaleString().replace(",", ""), 
         l.name, l.email, l.phone, l.country, l.company, l.role, l.interest, l.added_by || "Visitor", bNames, (l.notes || "").replace(/\n/g, " ")
       ];
@@ -1183,7 +1184,7 @@ function StaffDashboard({ currentUser, leads, brochures, onToggleBrochure, onAdd
             </div>
           )}
 
-          {tab === "reports" && <ReportsDashboard leads={leads} brochures={brochures} onExport={exportCSV} onUpdateLead={onUpdateLead} />}
+          {tab === "reports" && <ReportsDashboard leads={leads} brochures={brochures} onExport={exportCSV} onUpdateLead={onUpdateLead} currentUser={currentUser} />}
           {tab === "my_pass" && (
             <div style={{ maxWidth: 500, margin: "0 auto", animation: "fadeUp 0.5s ease" }}>
                <h2 style={{ fontSize: 24, fontFamily: SERIF, marginBottom: 25, color: T.navy }}>My Travel Documents</h2>
@@ -1415,7 +1416,7 @@ const COUNTRY_TO_ISO = {
   "Bolivia": "bo", "Paraguay": "py", "Uruguay": "uy", "United States": "us"
 };
 
-function LeadsTable({ leads, brochures, onUpdateLead }) {
+function LeadsTable({ leads, brochures, onUpdateLead, currentUser }) {
   const [search, setSearch] = useState("");
   const [filterCountry, setFilterCountry] = useState("");
   const [filterStaff, setFilterStaff] = useState("");
@@ -1423,6 +1424,24 @@ function LeadsTable({ leads, brochures, onUpdateLead }) {
   const [hideContacted, setHideContacted] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
   const [copiedId, setCopiedId] = useState(null);
+
+  const STAFF_COLORS = {
+    "Giulia Cimini": "#A7F3D0", // Emerald 200
+    "Ludovica Coccia": "#BFDBFE", // Blue 200
+    "Lorenza Ferretti": "#DDD6FE", // Violet 200
+    "Cristiano Braccili": "#FED7AA", // Orange 200
+    "Giuseppe Braccili": "#FECACA", // Red 200
+    "Visitor": "#F8FAFC"
+  };
+
+  const STAFF_HOVER_COLORS = {
+    "Giulia Cimini": "#6EE7B7", // Emerald 300
+    "Ludovica Coccia": "#93C5FD", // Blue 300
+    "Lorenza Ferretti": "#C4B5FD", // Violet 300
+    "Cristiano Braccili": "#FDBA74", // Orange 300
+    "Giuseppe Braccili": "#FCA5A5", // Red 300
+    "Visitor": "#F1F5F9"
+  };
 
   // Extract unique values for filters
   const countries = useMemo(() => [...new Set(leads.map(l => l.country).filter(Boolean))].sort(), [leads]);
@@ -1477,7 +1496,7 @@ function LeadsTable({ leads, brochures, onUpdateLead }) {
         </div>
         
         {/* FILTERS ROW */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 15 }}>
           <div style={{ position: "relative" }}>
             <div style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", opacity: 0.4 }}>
               <Icon name="search" size={14} color={T.navy} />
@@ -1516,6 +1535,17 @@ function LeadsTable({ leads, brochures, onUpdateLead }) {
             <button onClick={() => { setSearch(""); setFilterCountry(""); setFilterStaff(""); setFilterInterest(""); setHideContacted(false); }} style={{ background: "none", border: "none", color: T.error, fontSize: 12, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Clear Filters</button>
           )}
         </div>
+
+        {/* LEGEND ROW */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 15, padding: "12px 15px", background: T.white, borderRadius: 10, border: `1px dashed ${T.navy}15` }}>
+           <div style={{ fontSize: 11, fontWeight: 800, color: T.muted, textTransform: "uppercase", marginRight: 5, display: "flex", alignItems: "center" }}>Contacted By:</div>
+           {Object.entries(STAFF_COLORS).filter(([name]) => name !== "Visitor").map(([name, color]) => (
+             <div key={name} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <div style={{ width: 12, height: 12, borderRadius: 4, background: color, border: `1px solid ${T.navy}10` }} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: T.navy }}>{name.split(" ")[0]}</span>
+             </div>
+           ))}
+        </div>
       </div>
 
       <div style={{ overflowX: "auto" }}>
@@ -1552,14 +1582,17 @@ function LeadsTable({ leads, brochures, onUpdateLead }) {
             {filteredLeads.map((l, i) => (
               <tr key={l.id || i} style={{ 
                 borderBottom: `1px solid ${T.navy}05`, 
-                background: l.contacted ? "#ECFDF5" : (i % 2 === 0 ? T.white : "#F8FAFC"), 
+                background: l.contacted ? (STAFF_COLORS[l.contacted_by] || "#ECFDF5") : (i % 2 === 0 ? T.white : "#F8FAFC"), 
                 transition: "background 0.2s" 
-              }} onMouseEnter={e => e.currentTarget.style.background = l.contacted ? "#D1FAE5" : "#F1F5F9"} onMouseLeave={e => e.currentTarget.style.background = l.contacted ? "#ECFDF5" : (i % 2 === 0 ? T.white : "#F8FAFC")}>
+              }} onMouseEnter={e => e.currentTarget.style.background = l.contacted ? (STAFF_HOVER_COLORS[l.contacted_by] || "#D1FAE5") : "#F1F5F9"} onMouseLeave={e => e.currentTarget.style.background = l.contacted ? (STAFF_COLORS[l.contacted_by] || "#ECFDF5") : (i % 2 === 0 ? T.white : "#F8FAFC")}>
                 <td style={{ padding: "14px 20px", textAlign: "center" }}>
                    <input 
                     type="checkbox" 
                     checked={!!l.contacted} 
-                    onChange={() => onUpdateLead(l.id, { contacted: !l.contacted })}
+                    onChange={() => onUpdateLead(l.id, { 
+                      contacted: !l.contacted,
+                      contacted_by: !l.contacted ? currentUser : null
+                    })}
                     style={{ width: 18, height: 18, cursor: "pointer", accentColor: T.success }}
                    />
                 </td>
@@ -1631,7 +1664,7 @@ function LeadsTable({ leads, brochures, onUpdateLead }) {
   );
 }
 
-function ReportsDashboard({ leads, brochures, onExport, onUpdateLead }) {
+function ReportsDashboard({ leads, brochures, onExport, onUpdateLead, currentUser }) {
   const [tooltip, setTooltip] = useState(null);
   
   // 1. KPI Data
@@ -1898,7 +1931,7 @@ function ReportsDashboard({ leads, brochures, onExport, onUpdateLead }) {
         {/* SECTION 5: DETAILED LEADS EXPLORER (EXCEL TABLE) */}
         <div style={{ marginTop: 20 }}>
            <h3 style={{ fontSize: 12, fontWeight: 800, color: T.muted, textTransform: "uppercase", letterSpacing: 2, marginBottom: 20 }}>Detailed Leads Data</h3>
-           <LeadsTable leads={leads} brochures={brochures} onUpdateLead={onUpdateLead} />
+           <LeadsTable leads={leads} brochures={brochures} onUpdateLead={onUpdateLead} currentUser={currentUser} />
         </div>
       </div>
 
