@@ -1391,32 +1391,219 @@ function AnimatedNumber({ value, duration = 1500, format = (v) => v }) {
   }, [value, duration]);
   return format(display);
 }
+const COUNTRY_TO_ISO = {
+  "Italy": "it", "Turkey": "tr", "Germany": "de", "France": "fr", "Spain": "es",
+  "United Kingdom": "gb", "United States of America": "us", "China": "cn",
+  "Lebanon": "lb", "Romania": "ro", "Albania": "al", "Moldova": "md", "Greece": "gr",
+  "Jordan": "jo", "Egypt": "eg", "Saudi Arabia": "sa", "United Arab Emirates": "ae",
+  "Poland": "pl", "Ukraine": "ua", "Netherlands": "nl", "Belgium": "be", "Switzerland": "ch",
+  "Austria": "at", "Portugal": "pt", "Morocco": "ma", "Tunisia": "tn", "Algeria": "dz",
+  "India": "in", "Japan": "jp", "South Korea": "kr", "Brazil": "br", "Argentina": "ar",
+  "Canada": "ca", "Kuwait": "kw", "Palestine": "ps", "Iraq": "iq", "Bulgaria": "bg",
+  "Croatia": "hr", "Serbia": "rs", "Slovenia": "si", "Slovakia": "sk", "Hungary": "hu",
+  "Czech Republic": "cz", "Finland": "fi", "Sweden": "se", "Norway": "no", "Denmark": "dk",
+  "Vietnam": "vn", "Sudan": "sd", "Oman": "om", "Uzbekistan": "uz", "Qatar": "qa",
+  "Bahrain": "bh", "Libya": "ly", "Syria": "sy", "Yemen": "ye", "Nigeria": "ng",
+  "South Africa": "za", "Mexico": "mx", "Colombia": "co", "Russia": "ru", "Azerbaijan": "az",
+  "Bangladesh": "bd", "Chile": "cl", "San Marino": "sm", "Monaco": "mc", "Andorra": "ad",
+  "Luxembourg": "lu", "Malta": "mt", "Cyprus": "cy", "Iceland": "is", "Georgia": "ge",
+  "Armenia": "am", "Kazakhstan": "kz", "Kyrgyzstan": "kg", "Tajikistan": "tj", "Turkmenistan": "tm",
+  "Israel": "il", "Iran": "ir", "Pakistan": "pk", "Sri Lanka": "lk", "Nepal": "np",
+  "Thailand": "th", "Indonesia": "id", "Malaysia": "my", "Philippines": "ph", "Singapore": "sg",
+  "Australia": "au", "New Zealand": "nz", "Peru": "pe", "Venezuela": "ve", "Ecuador": "ec",
+  "Bolivia": "bo", "Paraguay": "py", "Uruguay": "uy", "United States": "us"
+};
+
+function LeadsTable({ leads, brochures }) {
+  const [search, setSearch] = useState("");
+  const [filterCountry, setFilterCountry] = useState("");
+  const [filterStaff, setFilterStaff] = useState("");
+  const [filterInterest, setFilterInterest] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
+  const [copiedId, setCopiedId] = useState(null);
+
+  // Extract unique values for filters
+  const countries = useMemo(() => [...new Set(leads.map(l => l.country).filter(Boolean))].sort(), [leads]);
+  const staffMembers = useMemo(() => [...new Set(leads.map(l => l.added_by).filter(Boolean))].sort(), [leads]);
+  const interests = useMemo(() => ["Braderm (Brand Distribution)", "LCB (Private Label)"], []);
+
+  const filteredLeads = useMemo(() => {
+    return leads
+      .filter(l => {
+        const matchesSearch = !search || 
+          l.name?.toLowerCase().includes(search.toLowerCase()) || 
+          l.email?.toLowerCase().includes(search.toLowerCase()) ||
+          l.company?.toLowerCase().includes(search.toLowerCase()) ||
+          l.phone?.toLowerCase().includes(search.toLowerCase()) ||
+          l.notes?.toLowerCase().includes(search.toLowerCase()) ||
+          l.added_by?.toLowerCase().includes(search.toLowerCase());
+        const matchesCountry = !filterCountry || l.country === filterCountry;
+        const matchesStaff = !filterStaff || l.added_by === filterStaff;
+        const matchesInterest = !filterInterest || l.interest === filterInterest;
+        return matchesSearch && matchesCountry && matchesStaff && matchesInterest;
+      })
+      .sort((a, b) => {
+        let aVal = a[sortConfig.key] || "";
+        let bVal = b[sortConfig.key] || "";
+        if (sortConfig.key === 'date') {
+          aVal = new Date(a.created_at || a.date).getTime();
+          bVal = new Date(b.created_at || b.date).getTime();
+        }
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+  }, [leads, search, filterCountry, filterStaff, filterInterest, sortConfig]);
+
+  const requestSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  return (
+    <Card style={{ padding: 0, overflow: "hidden", border: `1px solid ${T.navy}10` }}>
+      <div style={{ padding: "24px", background: "#F8FAFC", borderBottom: `1px solid ${T.navy}05` }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 15 }}>
+          <h3 style={{ fontSize: 18, fontFamily: SERIF, color: T.navy, margin: 0 }}>All Leads Explorer</h3>
+          <div style={{ display: "flex", gap: 10, background: T.white, padding: "4px 12px", borderRadius: 8, border: `1px solid ${T.navy}10`, fontSize: 12, fontWeight: 700, color: T.muted }}>
+             {filteredLeads.length} of {leads.length} leads
+          </div>
+        </div>
+        
+        {/* FILTERS ROW */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12 }}>
+          <div style={{ position: "relative" }}>
+            <div style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", opacity: 0.4 }}>
+              <Icon name="search" size={14} color={T.navy} />
+            </div>
+            <input 
+              placeholder="Search leads..." 
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ width: "100%", padding: "10px 12px 10px 34px", borderRadius: 10, border: `1.5px solid ${T.navy}10`, fontSize: 13, outline: "none", boxSizing: "border-box" }}
+            />
+          </div>
+          <select value={filterCountry} onChange={e => setFilterCountry(e.target.value)} style={{ padding: "10px", borderRadius: 10, border: `1.5px solid ${T.navy}10`, fontSize: 13, outline: "none", background: T.white }}>
+            <option value="">All Countries</option>
+            {countries.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <select value={filterStaff} onChange={e => setFilterStaff(e.target.value)} style={{ padding: "10px", borderRadius: 10, border: `1.5px solid ${T.navy}10`, fontSize: 13, outline: "none", background: T.white }}>
+            <option value="">All Staff</option>
+            {staffMembers.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <select value={filterInterest} onChange={e => setFilterInterest(e.target.value)} style={{ padding: "10px", borderRadius: 10, border: `1.5px solid ${T.navy}10`, fontSize: 13, outline: "none", background: T.white }}>
+            <option value="">All Interests</option>
+            {interests.map(i => <option key={i} value={i}>{i.split("(")[0]}</option>)}
+          </select>
+          {(search || filterCountry || filterStaff || filterInterest) && (
+            <button onClick={() => { setSearch(""); setFilterCountry(""); setFilterStaff(""); setFilterInterest(""); }} style={{ background: "none", border: "none", color: T.error, fontSize: 12, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Clear Filters</button>
+          )}
+        </div>
+      </div>
+
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 1100 }}>
+          <thead>
+            <tr style={{ background: T.navy, color: T.white }}>
+              {[
+                { label: "Date", key: "date" },
+                { label: "Lead Name", key: "name" },
+                { label: "Email", key: "email" },
+                { label: "Phone", key: "phone" },
+                { label: "Company", key: "company" },
+                { label: "Country", key: "country" },
+                { label: "Role", key: "role" },
+                { label: "Interest", key: "interest" },
+                { label: "Staff", key: "added_by" },
+                { label: "Notes", key: "notes" }
+              ].map(col => (
+                <th key={col.key} onClick={() => requestSort(col.key)} style={{ padding: "15px 20px", textAlign: "left", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, cursor: "pointer", whiteSpace: "nowrap" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    {col.label}
+                    <span style={{ fontSize: 10, opacity: sortConfig.key === col.key ? 1 : 0.3 }}>
+                      {sortConfig.key === col.key ? (sortConfig.direction === 'asc' ? "↑" : "↓") : "⇅"}
+                    </span>
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filteredLeads.map((l, i) => (
+              <tr key={l.id || i} style={{ borderBottom: `1px solid ${T.navy}05`, background: i % 2 === 0 ? T.white : "#F8FAFC", transition: "background 0.2s" }} onMouseEnter={e => e.currentTarget.style.background = "#F1F5F9"} onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? T.white : "#F8FAFC"}>
+                <td style={{ padding: "14px 20px", fontSize: 12, color: T.muted, whiteSpace: "nowrap" }}>{new Date(l.created_at || l.date).toLocaleDateString()}</td>
+                <td style={{ padding: "14px 20px", fontSize: 13, fontWeight: 800, color: T.navy }}>{l.name}</td>
+                <td style={{ padding: "14px 20px", fontSize: 13, color: T.teal, fontWeight: 600 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {l.email}
+                    <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText(l.email);
+                          setCopiedId(l.id || i);
+                          setTimeout(() => setCopiedId(null), 2000);
+                        }}
+                        title="Copy Email"
+                        style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex", opacity: 0.4, transition: "opacity 0.2s" }}
+                        onMouseEnter={e => e.currentTarget.style.opacity = 1}
+                        onMouseLeave={e => e.currentTarget.style.opacity = 0.4}
+                      >
+                        <Icon name={copiedId === (l.id || i) ? "check" : "copy"} size={14} color={copiedId === (l.id || i) ? T.success : T.teal} />
+                      </button>
+                      {copiedId === (l.id || i) && (
+                        <div style={{ position: "absolute", left: "100%", background: T.success, color: T.white, fontSize: 10, padding: "2px 6px", borderRadius: 4, fontWeight: 900, animation: "fadeUp 0.3s ease", whiteSpace: "nowrap", zIndex: 10 }}>
+                          COPIATO!
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </td>
+                <td style={{ padding: "14px 20px", fontSize: 13, color: T.navy }}>{l.phone || "—"}</td>
+                <td style={{ padding: "14px 20px", fontSize: 13, color: T.navy }}>{l.company || "—"}</td>
+                <td style={{ padding: "14px 20px", fontSize: 13, fontWeight: 700 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <img src={`https://flagcdn.com/w20/${COUNTRY_TO_ISO[l.country] || "un"}.png`} alt={l.country} style={{ width: 16, height: 12, objectFit: "cover", borderRadius: 2 }} onError={e => e.target.style.display = 'none'} />
+                    {l.country}
+                  </div>
+                </td>
+                <td style={{ padding: "14px 20px" }}>
+                  <span style={{ background: T.navy + "08", color: T.navy, padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700 }}>{l.role || "Visitor"}</span>
+                </td>
+                <td style={{ padding: "14px 20px" }}>
+                  <span style={{ background: T.gold + "15", color: T.gold, padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 800 }}>{l.interest?.split("(")[0] || "General"}</span>
+                </td>
+                <td style={{ padding: "14px 20px", fontSize: 11, fontWeight: 700, color: T.muted }}>
+                  {l.added_by || "Visitor"}
+                </td>
+                <td className="note-cell" style={{ padding: "14px 20px", fontSize: 12, color: T.muted, maxWidth: 180, position: "relative" }}>
+                  <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {l.notes || "—"}
+                  </div>
+                  {l.notes && (
+                    <div className={`note-tooltip ${i < 3 ? "below" : ""}`}>
+                      {l.notes}
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {filteredLeads.length === 0 && (
+          <div style={{ textAlign: "center", padding: "60px 20px", color: T.muted, fontSize: 14 }}>
+            No leads match your current filters.
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
 
 function ReportsDashboard({ leads, brochures, onExport }) {
   const [tooltip, setTooltip] = useState(null);
-  
-  const COUNTRY_TO_ISO = {
-    "Italy": "it", "Turkey": "tr", "Germany": "de", "France": "fr", "Spain": "es",
-    "United Kingdom": "gb", "United States of America": "us", "China": "cn",
-    "Lebanon": "lb", "Romania": "ro", "Albania": "al", "Moldova": "md", "Greece": "gr",
-    "Jordan": "jo", "Egypt": "eg", "Saudi Arabia": "sa", "United Arab Emirates": "ae",
-    "Poland": "pl", "Ukraine": "ua", "Netherlands": "nl", "Belgium": "be", "Switzerland": "ch",
-    "Austria": "at", "Portugal": "pt", "Morocco": "ma", "Tunisia": "tn", "Algeria": "dz",
-    "India": "in", "Japan": "jp", "South Korea": "kr", "Brazil": "br", "Argentina": "ar",
-    "Canada": "ca", "Kuwait": "kw", "Palestine": "ps", "Iraq": "iq", "Bulgaria": "bg",
-    "Croatia": "hr", "Serbia": "rs", "Slovenia": "si", "Slovakia": "sk", "Hungary": "hu",
-    "Czech Republic": "cz", "Finland": "fi", "Sweden": "se", "Norway": "no", "Denmark": "dk",
-    "Vietnam": "vn", "Sudan": "sd", "Oman": "om", "Uzbekistan": "uz", "Qatar": "qa",
-    "Bahrain": "bh", "Libya": "ly", "Syria": "sy", "Yemen": "ye", "Nigeria": "ng",
-    "South Africa": "za", "Mexico": "mx", "Colombia": "co", "Russia": "ru", "Azerbaijan": "az",
-    "Bangladesh": "bd", "Chile": "cl", "San Marino": "sm", "Monaco": "mc", "Andorra": "ad",
-    "Luxembourg": "lu", "Malta": "mt", "Cyprus": "cy", "Iceland": "is", "Georgia": "ge",
-    "Armenia": "am", "Kazakhstan": "kz", "Kyrgyzstan": "kg", "Tajikistan": "tj", "Turkmenistan": "tm",
-    "Israel": "il", "Iran": "ir", "Pakistan": "pk", "Sri Lanka": "lk", "Nepal": "np",
-    "Thailand": "th", "Indonesia": "id", "Malaysia": "my", "Philippines": "ph", "Singapore": "sg",
-    "Australia": "au", "New Zealand": "nz", "Peru": "pe", "Venezuela": "ve", "Ecuador": "ec",
-    "Bolivia": "bo", "Paraguay": "py", "Uruguay": "uy"
-  };
   
   // 1. KPI Data
   const totalLeads = leads.length;
@@ -1511,7 +1698,7 @@ function ReportsDashboard({ leads, brochures, onExport }) {
   }, [leads]);
 
   return (
-    <div style={{ maxWidth: 1000, margin: "0 auto", animation: "fadeIn 0.6s ease" }}>
+    <div style={{ maxWidth: "95%", margin: "0 auto", animation: "fadeIn 0.6s ease" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 30 }}>
         <div>
           <h2 style={{ fontSize: 28, fontFamily: SERIF, color: T.navy, margin: 0 }}>Fair Performance Report</h2>
@@ -1673,11 +1860,17 @@ function ReportsDashboard({ leads, brochures, onExport }) {
                     const [dayHour, count] = peak;
                     const [d, h] = dayHour.split('-');
                     return <>• Peak traffic: <b>{d}, {h}:00 – {parseInt(h)+1}:00</b> ({count} leads)</>;
-                 })()}<br/>
+                  })()}<br/>
                  • Average conversion speed: <b>~4 min</b> per lead
               </div>
            </div>
         </Card>
+
+        {/* SECTION 5: DETAILED LEADS EXPLORER (EXCEL TABLE) */}
+        <div style={{ marginTop: 20 }}>
+           <h3 style={{ fontSize: 12, fontWeight: 800, color: T.muted, textTransform: "uppercase", letterSpacing: 2, marginBottom: 20 }}>Detailed Leads Data</h3>
+           <LeadsTable leads={leads} brochures={brochures} />
+        </div>
       </div>
 
 
@@ -1698,6 +1891,60 @@ function ReportsDashboard({ leads, brochures, onExport }) {
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; borderRadius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+        
+        .note-cell:hover .note-tooltip {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(-10px);
+        }
+        
+        .note-tooltip {
+          position: absolute;
+          bottom: 100%;
+          right: 0;
+          transform: translateY(0);
+          background: ${T.navy};
+          color: #FFF;
+          padding: 12px 16px;
+          border-radius: 12px;
+          width: 320px;
+          font-size: 11px;
+          line-height: 1.5;
+          z-index: 999;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+          pointer-events: none;
+          white-space: normal;
+          border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .note-tooltip::after {
+          content: '';
+          position: absolute;
+          top: 100%;
+          right: 20px;
+          border-width: 6px;
+          border-style: solid;
+          border-color: ${T.navy} transparent transparent transparent;
+        }
+        
+        .note-tooltip.below {
+          bottom: auto;
+          top: 100%;
+          transform: translateY(0);
+        }
+        
+        .note-cell:hover .note-tooltip.below {
+          transform: translateY(10px);
+        }
+        
+        .note-tooltip.below::after {
+          top: auto;
+          bottom: 100%;
+          border-color: transparent transparent ${T.navy} transparent;
+        }
       `}</style>
     </div>
   );
